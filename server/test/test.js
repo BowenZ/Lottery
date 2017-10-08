@@ -10,28 +10,28 @@ const Parti = require('../models/participation.js')
 // 	console.log('====user====', data)
 // })
 
-// var admin = new Admin({
-// 	name: 'admin',
-// 	password: 'admin'
-// })
+var admin = new Admin({
+	name: 'admin',
+	password: 'admin'
+})
 // admin.save().then(data => {
 // 	console.log('====save admin====', data)
-// 	admin.findOne('admin', 'admin').then(data => {
-// 		console.log('====find admin====', data)
-// 	})
+	admin.findOne('admin', 'admin').then(data => {
+		console.log('====find admin====', data)
+	})
 // })
 
-let parti = new Parti({
-	lotteryId: ObjectId(1),
-	userId: ObjectId(2)
-})
+// let parti = new Parti({
+// 	lotteryId: ObjectId(1),
+// 	userId: ObjectId(2)
+// })
 
-parti.checkAlreadyIn(1,2).then(res => {
-	console.log('====in====', res)
-	if(!res){
-		parti.save().then(data => {
-			console.log('====save parti====', data)
-		})
-	}
-})
+// parti.checkAlreadyIn(1,2).then(res => {
+// 	console.log('====in====', res)
+// 	if(!res){
+// 		parti.save().then(data => {
+// 			console.log('====save parti====', data)
+// 		})
+// 	}
+// })
 // parti.save().then()

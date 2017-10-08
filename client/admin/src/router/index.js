@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import mainPage from './children/mainPage.js'
+// import mainPage from './children/mainPage.js'
+import login from './children/login.js'
+import adminPage from './children/adminPage.js'
+
 
 Vue.use(Router)
 
@@ -9,8 +12,8 @@ const router = new Router({
   routes: [{
     path: '/',
     name: 'index',
-    redirect: 'main'
-  }, mainPage]
+    redirect: 'admin'
+  }, login, adminPage]
 })
 
 // 路由拦截

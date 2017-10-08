@@ -4,11 +4,11 @@ const lotterySchema = new mongoose.Schema({
 	title: String,
 	content: String,
 	level: Number,
-	awards: [{
+	prizes: [{
 		level: Number,
-		title: String,
-		content: String,
-		imgurl: String,
+		prizeTitle: String,
+		prizeContent: String,
+		imgurl: [String],
 		number: Number,
 		state: Number
 	}],

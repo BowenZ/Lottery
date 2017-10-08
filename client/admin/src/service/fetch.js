@@ -1,6 +1,6 @@
 import axios from 'axios'
 import store from '@/store'
-import { stringify } from 'qs' //序列化表单数据
+import qs from 'qs' //序列化表单数据
 import router from "@/router"
 import { Message } from "element-ui"
 
@@ -8,7 +8,7 @@ const Axios = axios.create({
   baseURL: "/",
   timeout: 10000,
   responseType: "json",
-  withCredentials: true, // 是否允许带cookie这些
+  withCredentials: false, // 是否允许带cookie这些
   headers: {
     "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
   }
@@ -45,23 +45,25 @@ Axios.interceptors.request.use(
 )
 
 //返回状态判断(添加响应拦截器)
-Axios.interceptors.response.use(
+/*Axios.interceptors.response.use(
   res => {
     //对响应数据做些事
+    console.log('====res====', res)
     if (res.data && !res.data.success) {
-      Message({
-        //  饿了么的消息弹窗组件,类似toast
-        showClose: true,
-        message: res.data.error.message.message
-          ? res.data.error.message.message
-          : res.data.error.message,
-        type: "error"
-      })
-      return Promise.reject(res.data.error.message)
+      // Message({
+      //   //  饿了么的消息弹窗组件,类似toast
+      //   showClose: true,
+      //   message: res.data.msg
+      //     ? res.data.msg
+      //     : '请求出错',
+      //   type: "error"
+      // })
+      // return Promise.reject(res.data.msg)
     }
     return res
   },
   error => {
+    console.log('====error====', error)
     // 用户登录的时候会拿到一个基础信息,比如用户名,token,过期时间戳
     // 直接丢localStorage或者sessionStorage
     if (!window.localStorage.getItem("loginUserBaseInfo")) {
@@ -114,7 +116,7 @@ Axios.interceptors.response.use(
     let errorInfo =  error.data.error ? error.data.error.message : error.data
     return Promise.reject(errorInfo)
   }
-)
+)*/
 
 // 对axios的实例重新封装成一个plugin ,方便 Vue.use(xxxx)
 export default {
@@ -123,19 +125,15 @@ export default {
   }
 }
 
-export function fetch(url, data, type='post'){
+export function fetch(url, data, method='post'){
 	let options = {
-		type: type,
+		method: method,
 		url: url
 	}
-	if(type.toLowerCase().match(/post|put|patch/i)){
+	if(method.toLowerCase().match(/post|put|patch/i)){
 		options.data = data
 	}else{
 		options.params = data
 	}
-	return Axios({
-		method: type,
-		url: url,
-
-	})
+	return Axios(options)
 }

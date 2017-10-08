@@ -5,9 +5,9 @@ import App from './App'
 import router from './router'
 import store from './store'
 
-import { Button, Select } from 'element-ui'
-Vue.use(Button)
-Vue.use(Select)
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-default/index.css'
+Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
