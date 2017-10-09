@@ -45,78 +45,34 @@ Axios.interceptors.request.use(
 )
 
 //返回状态判断(添加响应拦截器)
-/*Axios.interceptors.response.use(
+Axios.interceptors.response.use(
   res => {
     //对响应数据做些事
     console.log('====res====', res)
     if (res.data && !res.data.success) {
-      // Message({
-      //   //  饿了么的消息弹窗组件,类似toast
-      //   showClose: true,
-      //   message: res.data.msg
-      //     ? res.data.msg
-      //     : '请求出错',
-      //   type: "error"
-      // })
+      Message({
+        showClose: true,
+        message: res.data.msg
+          ? res.data.msg
+          : '请求失败',
+        type: "warning"
+      })
       // return Promise.reject(res.data.msg)
     }
     return res
   },
   error => {
     console.log('====error====', error)
-    // 用户登录的时候会拿到一个基础信息,比如用户名,token,过期时间戳
-    // 直接丢localStorage或者sessionStorage
-    if (!window.localStorage.getItem("loginUserBaseInfo")) {
-      // 若是接口访问的时候没有发现有鉴权的基础信息,直接返回登录页
-      router.push({
-        path: "/login"
-      })
-    } else {
-      // 若是有基础信息的情况下,判断时间戳和当前的时间,若是当前的时间大于服务器过期的时间
-      // 乖乖的返回去登录页重新登录
-      let lifeTime =
-        JSON.parse(window.localStorage.getItem("loginUserBaseInfo")).lifeTime *
-        1000
-      let nowTime = new Date().getTime() // 当前时间的时间戳
-
-      if (nowTime > lifeTime) {
-        Message({
-          showClose: true,
-          message: "登录状态信息过期,请重新登录",
-          type: "error"
-        })
-        router.push({
-          path: "/login"
-        })
-      } else {
-        // 下面是接口回调的satus ,因为我做了一些错误页面,所以都会指向对应的报错页面
-        if (error.response.status === 403) {
-          router.push({
-            path: "/error/403"
-          })
-        }
-        if (error.response.status === 500) {
-          router.push({
-            path: "/error/500"
-          })
-        }
-        if (error.response.status === 502) {
-          router.push({
-            path: "/error/502"
-          })
-        }
-        if (error.response.status === 404) {
-          router.push({
-            path: "/error/404"
-          })
-        }
-      }
-    }
-    // 返回 response 里的错误信息
-    let errorInfo =  error.data.error ? error.data.error.message : error.data
-    return Promise.reject(errorInfo)
+    Message({
+      showClose: true,
+      message: res.data.msg
+        ? res.data.msg
+        : '请求出错',
+      type: "warning"
+    })
+    return Promise.reject(error)
   }
-)*/
+)
 
 // 对axios的实例重新封装成一个plugin ,方便 Vue.use(xxxx)
 export default {

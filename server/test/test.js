@@ -1,8 +1,9 @@
 const mongoose = require('../lib/mongo.js')
 const ObjectId = mongoose.Schema.Types.ObjectId
-const User = require('../models/users.js')
+const User = require('../models/user.js')
 const Admin = require('../models/admin.js')
 const Parti = require('../models/participation.js')
+const Lottery = require('../models/lottery.js')
 
 // var user = new User()
 
@@ -10,15 +11,15 @@ const Parti = require('../models/participation.js')
 // 	console.log('====user====', data)
 // })
 
-var admin = new Admin({
-	name: 'admin',
-	password: 'admin'
-})
+// var admin = new Admin({
+// 	name: 'admin',
+// 	password: 'admin'
+// })
 // admin.save().then(data => {
 // 	console.log('====save admin====', data)
-	admin.findOne('admin', 'admin').then(data => {
-		console.log('====find admin====', data)
-	})
+	// admin.findOne('admin', 'admin').then(data => {
+	// 	console.log('====find admin====', data)
+	// })
 // })
 
 // let parti = new Parti({
@@ -35,3 +36,8 @@ var admin = new Admin({
 // 	}
 // })
 // parti.save().then()
+// 
+var lottery = new Lottery()
+Lottery.findAll().then(data => {
+	console.log('====data====', data)
+})

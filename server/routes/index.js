@@ -31,9 +31,84 @@ router.post('/lottery', function(req, res){
 	let data = JSON.parse(req.body.data)
 	data.state = 0
 	let lottery = new Lottery(data)
-	lottery.save().then(res => {
-		console.log('====save lottery====', res)
+	lottery.save().then(data => {
+		console.log('====save lottery====', data)
+		res.json({
+			success: true,
+			data
+		})
+	}).catch(err => {
+		res.json({
+			success: false,
+			msg: '添加抽奖请求失败',
+			err
+		})
 	})
+})
+
+router.get('/lottery', (req, res) => {
+	Lottery.findAll().then(data => {
+		res.json({
+			success: true,
+			data
+		})
+	}).catch(err => {
+		res.json({
+			success: false,
+			msg: '查询抽奖信息出错',
+			err
+		})
+	})
+})
+
+router.get('/lottery/:id', function(req, res){
+	console.log('====param====', req.param)
+	if(req.params){
+
+	}
+})
+
+router.delete('/lottery/:id', (req, res) => {
+	if(req.params){
+		Lottery.deleteOne(req.params.id).then(data => {
+			console.log('====data====', data)
+			res.json({
+				success: true,
+				data
+			})
+		}).catch(err => {
+			res.json({
+				success: false,
+				err
+			})
+		})
+	}else{
+		res.json({
+			success: false,
+			msg: '未指定删除数据的id'
+		})
+	}
+})
+
+router.put('/lottery/:id', (req, res) => {
+	if(req.params){
+		Lottery.changeState(req.params.id, req.body.state).then(data => {
+			res.json({
+				success: true,
+				data
+			})
+		}).catch(err => {
+			res.json({
+				success: false,
+				err
+			})
+		})
+	}else{
+		res.json({
+			success: false,
+			msg: '未指定数据的id'
+		})
+	}
 })
 
 module.exports = router;

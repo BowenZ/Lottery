@@ -9,7 +9,7 @@ var sassMiddleware = require('node-sass-middleware');
 var cors = require('cors')
 
 var index = require('./routes/index');
-var users = require('./routes/users');
+var user = require('./routes/user');
 var upload = require('./routes/upload');
 
 var app = express();
@@ -31,10 +31,10 @@ app.use(sassMiddleware({
   indentedSyntax: true, // true = .sass and false = .scss
   sourceMap: true
 }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/users', users);
+app.use('/user', user);
 app.use('/upload', upload);
 
 // catch 404 and forward to error handler

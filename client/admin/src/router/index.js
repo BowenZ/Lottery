@@ -4,7 +4,7 @@ import Router from 'vue-router'
 // import mainPage from './children/mainPage.js'
 import login from './children/login.js'
 import adminPage from './children/adminPage.js'
-
+import startLottery from '@/views/lotteryPage/'
 
 Vue.use(Router)
 
@@ -13,6 +13,10 @@ const router = new Router({
     path: '/',
     name: 'index',
     redirect: 'admin'
+  }, {
+    path: '/startLottery',
+    name: 'startLottery',
+    component: startLottery
   }, login, adminPage]
 })
 

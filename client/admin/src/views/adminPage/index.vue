@@ -3,8 +3,10 @@
   <div class="nav-container">
     <el-menu theme="dark"
              :default-active="activeIndex"
+             :router="true"
              mode="horizontal">
-      <el-menu-item index="1">抽奖管理</el-menu-item>
+      <el-menu-item index="/startLottery">开始抽奖</el-menu-item>
+      <el-menu-item index="/admin/lotteryAdmin">抽奖活动管理</el-menu-item>
     </el-menu>
   </div>
   <div class="main-container">
@@ -21,8 +23,11 @@ export default {
 
   data() {
     return {
-    	 activeIndex: '1',
+    	 activeIndex: '2',
     }
+  },
+  created(){
+    this.activeIndex = this.$route.fullPath
   }
 };
 
@@ -33,9 +38,11 @@ export default {
 	position: fixed;
 	top: 0;
 	width: 100%;
+	z-index: 9;
 }
 .main-container{
 	max-width: 1024px;
 	margin: 60px auto 0;
+	padding: 20px;
 }
 </style>

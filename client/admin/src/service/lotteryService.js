@@ -7,6 +7,30 @@ const addLottery = function(data){
 	})
 }
 
+const findAllLottery = function(){
+	return fetch(api.FIND_ALL_LOTTERY, null, 'get')
+}
+
+const deleteLottery = function(id){
+	return fetch(api.LOTTERY + '/' + id, null, 'delete')
+}
+
+const startLottery = function(id){
+	return fetch(api.LOTTERY + '/' + id, {
+		state: 1
+	}, 'put')
+}
+
+const stopLottery = function(id){
+	return fetch(api.LOTTERY + '/' + id, {
+		state: 2
+	}, 'put')
+}
+
 export default {
-	addLottery
+	addLottery,
+	findAllLottery,
+	deleteLottery,
+	startLottery,
+	stopLottery
 }
