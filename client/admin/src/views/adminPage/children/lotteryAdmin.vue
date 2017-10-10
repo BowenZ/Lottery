@@ -8,45 +8,47 @@
         <el-table :data="tableData" style="width: 100%">
           <el-table-column type="expand">
             <template scope="scope">
-            	<div class="lottery-detail">
-            		<ul v-if="scope.row.prizes && scope.row.prizes.length">
-	              	<li v-for="(item, index) in scope.row.prizes" :key="index">
-	              		<div class="table-prize">
-	              			<h3>{{chineseNumber[item.level - 1]}}等奖</h3>
-	              			<p>奖品名：{{item.prizeTitle}}</p>
-	              			<p>奖品内容：{{item.prizeContent}}</p>
-	              			<p>奖品数量：{{item.number}}</p>
-	              			<p>奖品图片：<img v-for="(img, imgIndex) in item.imgurl" :key="index" :src="'http://localhost:3000/public/upload/img/' + img" alt=""></p>
-	              		</div>
-	              	</li>
-	              </ul>	
-            	</div>
+              <div class="lottery-detail">
+            		<p>活动内容：{{scope.row.content}}</p>
+            		<img :src="'http://localhost:3000/public/upload/img/' + scope.row.companyLogo" alt="logo">
+                <ul v-if="scope.row.prizes && scope.row.prizes.length">
+                  <li v-for="(item, index) in scope.row.prizes" :key="index">
+                    <div class="table-prize">
+                      <h3>{{chineseNumber[item.level - 1]}}等奖</h3>
+                      <p>奖品名：{{item.prizeTitle}}</p>
+                      <p>奖品内容：{{item.prizeContent}}</p>
+                      <p>奖品数量：{{item.number}}</p>
+                      <p>奖品图片：<img v-for="(img, imgIndex) in item.imgurl" :key="index" :src="'http://localhost:3000/public/upload/img/' + img" alt=""></p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </template>
           </el-table-column>
           <el-table-column label="活动名称" prop="title">
           </el-table-column>
-          <el-table-column label="活动内容" prop="content">
+          <el-table-column label="公司名" prop="companyName">
           </el-table-column>
           <el-table-column label="奖品等级" prop="level" width="100">
           </el-table-column>
           <el-table-column label="创建时间" prop="createTime" width="220">
-          	<template scope="scope">
-          		{{formatDate(scope.row.createTime)}}
-          	</template>
+            <template scope="scope">
+              {{formatDate(scope.row.createTime)}}
+            </template>
           </el-table-column>
           <el-table-column label="状态">
-          	<template scope="scope">
-          		<el-tag v-if="scope.row.state == 0">未开始</el-tag>
-          		<el-tag v-if="scope.row.state == 1" type="success">已开始</el-tag>
-          		<el-tag v-if="scope.row.state == 2" type="gray">已停止</el-tag>
-          	</template>
+            <template scope="scope">
+              <el-tag v-if="scope.row.state == 0">未开始</el-tag>
+              <el-tag v-if="scope.row.state == 1" type="success">已开始</el-tag>
+              <el-tag v-if="scope.row.state == 2" type="gray">已停止</el-tag>
+            </template>
           </el-table-column>
           <el-table-column label="操作">
-          	<template scope="scope">
-          		<el-button type="text" v-if="scope.row.state != 1" @click="startLottery(scope.$index)">开始</el-button>
-          		<el-button type="text" v-if="scope.row.state == 1" @click="stopLottery(scope.$index)">停止</el-button>
-          		<el-button type="text" @click="deleteLottery(scope.$index)">删除</el-button>
-          	</template>
+            <template scope="scope">
+              <el-button type="text" v-if="scope.row.state != 1" @click="startLottery(scope.$index)">开始</el-button>
+              <el-button type="text" v-if="scope.row.state == 1" @click="stopLottery(scope.$index)">停止</el-button>
+              <el-button type="text" @click="deleteLottery(scope.$index)">删除</el-button>
+            </template>
           </el-table-column>
         </el-table>
       </div>
@@ -58,6 +60,14 @@
         </el-form-item>
         <el-form-item label="活动内容">
           <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" v-model="formModel.content"></el-input>
+        </el-form-item>
+        <el-form-item label="公司名" prop="companyName">
+          <el-input v-model="formModel.companyName"></el-input>
+        </el-form-item>
+        <el-form-item label="公司logo" prop="companyName">
+          <el-upload :action="uploadUrl" list-type="picture" name="img" :on-success="handleUploadCompanyLogo" ref="logoUploader">
+            <el-button size="small" type="primary">点击上传</el-button>
+          </el-upload>
         </el-form-item>
         <el-form-item label="奖品等级">
           <el-input-number v-model="formModel.level" :min="1" :max="10" @change="handleLevelChange"></el-input-number>
@@ -72,7 +82,6 @@
               <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" v-model="item.prizeContent"></el-input>
             </el-form-item>
             <el-form-item label="奖品图片">
-              {{item.imgurl}}
               <el-upload :action="uploadUrl" ref="uploader" list-type="picture" name="img">
                 <el-button size="small" type="primary">点击上传</el-button>
               </el-upload>
@@ -116,6 +125,8 @@ export default {
       formModel: {
         title: '',
         content: '',
+        companyName: '',
+        companyLogo: '',
         level: 3,
         prizes: []
       },
@@ -136,15 +147,15 @@ export default {
     dataService.findAllLottery().then(res => {
       console.log('====res====', res)
       let result = res.data
-      if(result.success){
-      	this.tableData = result.data
+      if (result.success) {
+        this.tableData = result.data
       }
     })
   },
   methods: {
-  	formatDate(date){
-  		return util.formatDate(date)
-  	},
+    formatDate(date) {
+      return util.formatDate(date)
+    },
     onSubmit() {
       console.log('submit!')
     },
@@ -172,6 +183,27 @@ export default {
         this.changePrizes()
       }, 10)
     },
+    handleUploadCompanyLogo(response, file, fileList){
+    	console.log('====response====', response)
+    	if(response.success){
+    		this.formModel.companyLogo = response.filename
+    	}
+    },
+    clearForm(){
+    	this.formModel = {
+        title: '',
+        content: '',
+        companyName: '',
+        companyLogo: '',
+        level: 3,
+        prizes: []
+      }
+      this.$refs.uploader.forEach((item, index) => {
+        item.clearFiles()
+      })
+      this.$refs.logoUploader.clearFiles()
+      this.changePrizes()
+    },
     addLottery() {
       this.$refs.uploader.forEach((item, index) => {
         if (item.uploadFiles) {
@@ -187,75 +219,76 @@ export default {
       dataService.addLottery(JSON.stringify(this.formModel)).then(res => {
         console.log('====res====', res)
         let result = res.data
-        if(result.success){
-        	this.tableData.unshift(result.data)
-        	this.dialogVisible = false
-        	this.$message({
-        		message: '添加成功',
-        		type: 'success'
-        	})
+        if (result.success) {
+          this.tableData.unshift(result.data)
+          this.dialogVisible = false
+          this.$message({
+            message: '添加成功',
+            type: 'success'
+          })
+          this.clearForm()
         }
       }).catch(err => {
         this.$message({
-      		message: '添加请求失败',
-      		type: 'error'
-      	})
+          message: '添加请求失败',
+          type: 'error'
+        })
       })
     },
-    startLottery(index){
-    	if(this.tableData.some(item => item.state == 1)){
-    		this.$message({
-    			message: '同时只能激活一个活动',
-    			type: 'warning'
-    		})
-    		return
-    	}
-    	let id = this.tableData[index]._id
-    	dataService.startLottery(id).then(res => {
-    		console.log('========', res)
-    		let result = res.data
-    		if(result.success){
-    			this.tableData[index].state = 1
-    		}
-    	})
-    },
-    stopLottery(index){
-    	let id = this.tableData[index]._id
-    	dataService.stopLottery(id).then(res => {
-    		console.log('========', res)
-    		let result = res.data
-    		if(result.success){
-    			this.tableData[index].state = 2
-    		}
-    	})
-    },
-    deleteLottery(index){
-    	console.log('====delete====', index)
-    	this.$confirm('此操作将永久删除该活动, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+    startLottery(index) {
+      if (this.tableData.some(item => item.state == 1)) {
+        this.$message({
+          message: '同时只能激活一个活动',
           type: 'warning'
-        }).then(() => {
-        	let id = this.tableData[index]._id
-		    	dataService.deleteLottery(id).then(res => {
-		    		console.log('====res====', res)
-		    		if(res.data.success){
-		    			this.tableData.splice(index, 1)
-		    		}else{
-		    			this.$message({
-		    				message: '删除失败',
-		    				type: 'warning'
-		    			})
-		    		}
-		    	}).catch(err => {
-		    		this.$message({
-		    			message: '删除请求失败',
-		    			type: 'error'
-		    		})
-		    	})
-        }).catch(() => {
-         
         })
+        return
+      }
+      let id = this.tableData[index]._id
+      dataService.startLottery(id).then(res => {
+        console.log('========', res)
+        let result = res.data
+        if (result.success) {
+          this.tableData[index].state = 1
+        }
+      })
+    },
+    stopLottery(index) {
+      let id = this.tableData[index]._id
+      dataService.stopLottery(id).then(res => {
+        console.log('========', res)
+        let result = res.data
+        if (result.success) {
+          this.tableData[index].state = 2
+        }
+      })
+    },
+    deleteLottery(index) {
+      console.log('====delete====', index)
+      this.$confirm('此操作将永久删除该活动, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let id = this.tableData[index]._id
+        dataService.deleteLottery(id).then(res => {
+          console.log('====res====', res)
+          if (res.data.success) {
+            this.tableData.splice(index, 1)
+          } else {
+            this.$message({
+              message: '删除失败',
+              type: 'warning'
+            })
+          }
+        }).catch(err => {
+          this.$message({
+            message: '删除请求失败',
+            type: 'error'
+          })
+        })
+      }).catch(() => {
+
+      })
     }
   }
 };
@@ -272,19 +305,16 @@ export default {
   }
 }
 
-.lottery-detail{
-	max-height: 500px;
-	overflow: auto;
-	li{
-		margin-bottom: 30px;
-	}
-}
-
-.table-prize{
-	img{
-		width: 50%;
-		display: block;
-	}
+.lottery-detail {
+  max-height: 500px;
+  overflow: auto;
+  li {
+    margin-bottom: 30px;
+  }
+  img {
+    max-width: 50%;
+    display: block;
+  }
 }
 
 </style>

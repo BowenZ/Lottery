@@ -16,14 +16,12 @@ const userSchema = new mongoose.Schema({
 
 const UserModel = mongoose.model('User', userSchema)
 
-UserModel.findOne = function(openid){
-	return this.findOne({
-		'wx.openid': openid
-	})
+UserModel.findOneUser = function(param = {}){
+	return this.findOne(param)
 }
 
-UserModel.findAll = function(openid) {
-	return this.find({})
+UserModel.findAll = function(param = {}) {
+	return this.find(param)
 }
 
 UserModel.clear = function() {
@@ -32,10 +30,10 @@ UserModel.clear = function() {
 
 UserModel.findRandom = function() {
 	return new Promise((resolve, reject) => {
-		this.count({state: 0}).exec().then(count => {
+		this.count({state: 0}).then(count => {
 			console.log('====count====', count)
 			let random = Math.floor(Math.random() * count)
-			this.find({state: 0}).skip(random).limit(1).exec().then(result => {
+			this.find({state: 0}).skip(random).limit(1).then(result => {
 				console.log('====result====', result)
 				this.findOneAndUpdate({
 					_id: ObjectID(result[0]._id)

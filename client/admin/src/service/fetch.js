@@ -48,7 +48,6 @@ Axios.interceptors.request.use(
 Axios.interceptors.response.use(
   res => {
     //对响应数据做些事
-    console.log('====res====', res)
     if (res.data && !res.data.success) {
       Message({
         showClose: true,

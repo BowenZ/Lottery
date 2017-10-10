@@ -31,7 +31,7 @@ router.post('/img', upload.single('img'), function(req, res, next) {
     src.on('end', function() {
         res.json({
             success: true,
-            filename: file_name
+            filename: '/public/upload/img/' + file_name
         });
     });
     src.on('error', function(err) {

@@ -27,10 +27,15 @@ const stopLottery = function(id){
 	}, 'put')
 }
 
+const findActiveLottery = function(){
+	return fetch(api.LOTTERY + '?type=active', null, 'get')
+}
+
 export default {
 	addLottery,
 	findAllLottery,
 	deleteLottery,
 	startLottery,
-	stopLottery
+	stopLottery,
+	findActiveLottery
 }

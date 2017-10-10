@@ -47,7 +47,13 @@ router.post('/lottery', function(req, res){
 })
 
 router.get('/lottery', (req, res) => {
-	Lottery.findAll().then(data => {
+	let queryLottery
+	if(req.query.type == 'active'){
+		queryLottery = Lottery.findActive()
+	}else{
+		queryLottery = Lottery.findAll()
+	}
+	queryLottery.then(data => {
 		res.json({
 			success: true,
 			data
