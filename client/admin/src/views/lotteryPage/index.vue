@@ -11,7 +11,7 @@
       <h2>创业并不孤独，一步与你同路</h2>
     </div>
     <div class="content"
-         v-if="!showResult && !ended">
+         v-show="!showResult && !ended">
       <div class="user-list">
         <h3>当前参与人数</h3>
         <h4>
@@ -60,7 +60,8 @@
     </div>
     <div class="result-container"
          v-if="showResult || ended">
-      <div class="current-winner" v-if="showResult">
+      <div class="current-winner"
+           v-if="showResult">
         <div class="winner-list"
              :class="getWinnerFontSize()">
           <div v-for=" (winner, index) in currentWinner"
@@ -73,8 +74,50 @@
            class="primary-btn next-btn"
            @click="nextLottery()">确认</a>
       </div>
-      <div class="final-result" v-if="ended">
-      	<h1>final</h1>
+      <div class="final-result"
+           v-if="ended">
+        <h3>所有奖项已抽取完毕</h3>
+        <h4>请以上中奖人员，前往外场一步用车工作处兑奖</h4>
+        <div class="final-winners"
+             v-if="lottery && lottery.prizes.length !=3">
+          <div class="winner-container"
+               v-for="(item, index) in lottery.prizes"
+               :key="index">
+            <h4>{{chineseNumber[item.level-1]}}等奖：{{item.prizeTitle}}</h4>
+            <ul>
+              <li v-for="(winner, winnerIndex) in item.winners"
+                  :key="winnerIndex">{{winner.tel}}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="final-winners"
+             v-if="lottery && lottery.prizes.length ==3">
+          <div class="winner-col">
+            <div class="winner-container">
+              <h4>一等奖：{{lottery.prizes[0].prizeTitle}}</h4>
+              <ul>
+                <li v-for="(winner, winnerIndex) in lottery.prizes[0].winners"
+                    :key="winnerIndex">{{winner.tel}}</li>
+              </ul>
+            </div>
+            <div class="winner-container">
+              <h4>二等奖：{{lottery.prizes[1].prizeTitle}}</h4>
+              <ul>
+                <li v-for="(winner, winnerIndex) in lottery.prizes[1].winners"
+                    :key="winnerIndex">{{winner.tel}}</li>
+              </ul>
+            </div>
+          </div>
+          <div class="winner-col">
+            <div class="winner-container">
+              <h4>三等奖：{{lottery.prizes[2].prizeTitle}}</h4>
+              <ul>
+                <li v-for="(winner, winnerIndex) in lottery.prizes[2].winners"
+                    :key="winnerIndex">{{winner.tel}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -142,21 +185,27 @@ export default {
       if (result.success) {
         this.lottery = result.data
       }
+      setTimeout(() => {
+        if (!this.currentPrize) {
+          this.ended = true
+        }
+      }, 10)
     })
   },
   mounted() {
     window.addEventListener('keyup', e => {
       if (e.keyCode === 32) {
-      	if(this.showResult){
-      		this.nextLottery()
-      	}else{
-      		this.handleClickBtn()
-      	}
+        if (this.showResult) {
+          this.nextLottery()
+        } else {
+          this.handleClickBtn()
+        }
       }
     })
     setTimeout(() => {
       this.autoScrollPool(0)
-    }, 1000)
+    }, 500)
+
   },
   beforeDestroy() {
     this.sse && this.sse.close()
@@ -190,6 +239,9 @@ export default {
     autoScrollPool() {
       let $pool = this.$el.querySelector('.user-pool')
       let timer = setInterval(() => {
+        if (!$pool) {
+          return
+        }
         if ($pool.clientHeight + $pool.scrollTop === $pool.scrollHeight) {
           $pool.scrollTo(0, 0)
         }
@@ -250,7 +302,6 @@ export default {
       this.currentPrize.prizeState = 1
       this.showResult = false
       if (!this.currentPrize) {
-      	alert(0)
         this.ended = true
       }
     },
@@ -364,8 +415,17 @@ export default {
           flex: 1;
           font-size: 2rem;
           overflow: hidden;
+          display: flex;
+          padding-bottom: 15%;
+          ul {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
           li {
             letter-spacing: 0.3rem;
+            margin-bottom: 0.8rem;
           }
         }
       }
@@ -425,11 +485,14 @@ export default {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          &.size-1{
-          	font-size: 4rem;
+          &.size-1 {
+            font-size: 4rem;
           }
-          &.size-2{
-          	font-size: 3rem;
+          &.size-2 {
+            font-size: 3rem;
+          }
+          >div {
+            margin-bottom: 0.5rem;
           }
         }
         p {
@@ -447,6 +510,37 @@ export default {
           height: 3rem;
           line-height: 3rem;
           border-radius: 0.3rem;
+        }
+      }
+      .final-result {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        h3 {
+          font-size: 1.8rem;
+          font-weight: normal;
+        }
+        h4 {
+          font-weight: lighter;
+          font-size: 1.3rem;
+        }
+        .final-winners {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          .winner-col {
+            flex: 1;
+            ul {
+              list-style: none;
+            }
+            .winner-container {
+              li {
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+              }
+            }
+          }
         }
       }
     }
