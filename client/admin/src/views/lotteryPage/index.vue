@@ -65,7 +65,7 @@
         <div class="winner-list"
              :class="getWinnerFontSize()">
           <div v-for=" (winner, index) in currentWinner"
-               :key="index">{{winner.tel}}</div>
+               :key="index" v-html="hideTel(winner.tel)"></div>
         </div>
         <p v-if="currentWinner.length>1">恭喜以上{{chineseNumber[currentWinner.length-1]}}位获得</p>
         <p v-if="currentWinner.length==1">恭喜该用户获得</p>
@@ -86,7 +86,7 @@
             <h4>{{chineseNumber[item.level-1]}}等奖：{{item.prizeTitle}}</h4>
             <ul>
               <li v-for="(winner, winnerIndex) in item.winners"
-                  :key="winnerIndex">{{winner.tel}}</li>
+                  :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
             </ul>
           </div>
         </div>
@@ -97,14 +97,14 @@
               <h4>一等奖：{{lottery.prizes[0].prizeTitle}}</h4>
               <ul>
                 <li v-for="(winner, winnerIndex) in lottery.prizes[0].winners"
-                    :key="winnerIndex">{{winner.tel}}</li>
+                    :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
               </ul>
             </div>
             <div class="winner-container">
               <h4>二等奖：{{lottery.prizes[1].prizeTitle}}</h4>
               <ul>
                 <li v-for="(winner, winnerIndex) in lottery.prizes[1].winners"
-                    :key="winnerIndex">{{winner.tel}}</li>
+                    :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
               </ul>
             </div>
           </div>
@@ -113,7 +113,7 @@
               <h4>三等奖：{{lottery.prizes[2].prizeTitle}}</h4>
               <ul>
                 <li v-for="(winner, winnerIndex) in lottery.prizes[2].winners"
-                    :key="winnerIndex">{{winner.tel}}</li>
+                    :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
               </ul>
             </div>
           </div>
@@ -211,6 +211,9 @@ export default {
     this.sse && this.sse.close()
   },
   methods: {
+  	hideTel(tel){
+  		return tel.substr(0, 3) + '<span class="hide-tel">一步用车</span>' + tel.substr(-4, 4)
+  	},
     getWinnerFontSize() {
       let level = this.currentPrize.level
       if (level > 2) {
@@ -354,6 +357,14 @@ export default {
     text-align: center;
     color: #fff;
     font-size: 1.6rem;
+  }
+  .hide-tel{
+    font-size: 0.8em;
+    vertical-align: baseline;
+    color: #b8d6f1;
+    margin: 0 0.5rem;
+    position: relative;
+    bottom: 0.1em;
   }
   .lottery-wrapper {
     position: absolute;
