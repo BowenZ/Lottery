@@ -1,5 +1,6 @@
 const mongoose = require('../lib/mongo.js')
 const ObjectID = require('mongodb').ObjectID
+const ObjectIdType = mongoose.Schema.Types.ObjectId
 
 const lotterySchema = new mongoose.Schema({
 	title: String,
@@ -8,14 +9,27 @@ const lotterySchema = new mongoose.Schema({
 	companyLogo: String,
 	level: Number,
 	prizes: [{
-		level: Number,
+		level: {
+			type: Number,
+			default: 1
+		},
 		prizeTitle: String,
 		prizeContent: String,
 		imgurl: [String],
-		number: Number,
-		state: Number
+		number: {
+			type: Number,
+			default: 1
+		},
+		prizeState: {
+			type: Number,
+			default: 0
+		},
+		winners: []
 	}],
-	state: Number,
+	state: {
+		type: Number,
+		default: 0
+	},
 	createTime: {
 		type: Date,
 		default: Date.now
@@ -50,6 +64,48 @@ LotteryModel.changeState = function(id, state){
 			state: state
 		}
 	})
+}
+
+LotteryModel.setWinner = function(prizeId, winner){
+	return this.findOneAndUpdate({
+		'prizes._id': ObjectID(prizeId)
+	}, {
+		$set: {
+			'prizes.$.prizeState': 1,
+			'prizes.$.winners': winner
+		}
+	})
+}
+
+LotteryModel.clearWinner = function(id){
+	return new Promise((resolve, reject) => {
+		this.findOne({
+			_id: ObjectID(id)
+		}).then(doc => {
+
+			let prizes = doc.prizes
+			prizes.forEach(prize => {
+				prize.prizeState = 0
+				prize.winners = []
+			})
+
+			this.update({
+				_id: ObjectID(id)
+			}, {
+				$set: {
+					prizes
+				}
+			}).then(res => {
+				resolve(res)
+			}).catch(err => {
+				reject(err)
+			})
+
+		}).catch(err => {
+			reject(err)
+		})
+	})
+	
 }
 
 module.exports = LotteryModel

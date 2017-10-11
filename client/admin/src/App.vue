@@ -12,6 +12,9 @@ export default {
 
 <style lang="scss">
 @import '~@/assets/sass/base.scss';
+*{
+  box-sizing: border-box;
+}
 html,body{
   margin: 0;
   padding: 0;

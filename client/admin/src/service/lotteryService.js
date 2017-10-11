@@ -31,11 +31,24 @@ const findActiveLottery = function(){
 	return fetch(api.LOTTERY + '?type=active', null, 'get')
 }
 
+const setLotteryWinner = function(lotteryId, prizeId, winner){
+	return fetch(api.LOTTERY + '/' + lotteryId, {
+		prizeId,
+		winner
+	}, 'put')
+}
+
+const clearLotteryWinner = function(id){
+	return fetch(api.LOTTERY + '/' + id + '?param=clearWinner', null, 'put')
+}
+
 export default {
 	addLottery,
 	findAllLottery,
 	deleteLottery,
 	startLottery,
 	stopLottery,
-	findActiveLottery
+	findActiveLottery,
+	setLotteryWinner,
+	clearLotteryWinner
 }

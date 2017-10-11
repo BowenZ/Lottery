@@ -3,23 +3,21 @@ const ObjectID = require('mongodb').ObjectID
 const ObjectIdType = mongoose.Schema.Types.ObjectId
 
 const winnerSchema = new mongoose.Schema({
-	lotteryId: ObjectIdType,
-	userId: ObjectIdType,
+	lotteryId: {
+		type: ObjectIdType,
+		ref: 'Lottery'
+	},
+	userId: {
+		type: ObjectIdType,
+		ref: 'User'
+	},
 	level: Number
 })
 
+const WinnerModel = mongoose.model('Winner', winnerSchema)
 
-const userSchema = new mongoose.Schema({
-	name: String,
-	tel: String,
-	createTime: {
-		type: Date,
-		default: Date.now
-	},
-	state: {
-		type: Number,
-		default: 0
-	}
-})
+WinnerModel.findWinnerByLottery = function(lotteryId){
+	return this.find()
+}
 
-const UserModel = mongoose.model('User', userSchema)
+module.exports = WinnerModel

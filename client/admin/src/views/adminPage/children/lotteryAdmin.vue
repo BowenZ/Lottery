@@ -10,7 +10,7 @@
             <template scope="scope">
               <div class="lottery-detail">
             		<p>活动内容：{{scope.row.content}}</p>
-            		<img :src="'http://localhost:3000/public/upload/img/' + scope.row.companyLogo" alt="logo">
+            		<img :src="getImgUrl(scope.row.companyLogo)" alt="logo">
                 <ul v-if="scope.row.prizes && scope.row.prizes.length">
                   <li v-for="(item, index) in scope.row.prizes" :key="index">
                     <div class="table-prize">
@@ -18,7 +18,7 @@
                       <p>奖品名：{{item.prizeTitle}}</p>
                       <p>奖品内容：{{item.prizeContent}}</p>
                       <p>奖品数量：{{item.number}}</p>
-                      <p>奖品图片：<img v-for="(img, imgIndex) in item.imgurl" :key="index" :src="'http://localhost:3000/public/upload/img/' + img" alt=""></p>
+                      <p>奖品图片：<img v-for="(img, imgIndex) in item.imgurl" :key="index" :src="getImgUrl(img)" alt=""></p>
                     </div>
                   </li>
                 </ul>
@@ -43,10 +43,11 @@
               <el-tag v-if="scope.row.state == 2" type="gray">已停止</el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="150">
             <template scope="scope">
               <el-button type="text" v-if="scope.row.state != 1" @click="startLottery(scope.$index)">开始</el-button>
               <el-button type="text" v-if="scope.row.state == 1" @click="stopLottery(scope.$index)">停止</el-button>
+              <el-button type="text" @click="clearLotteryWinner(scope.$index)">重置</el-button>
               <el-button type="text" @click="deleteLottery(scope.$index)">删除</el-button>
             </template>
           </el-table-column>
@@ -100,8 +101,9 @@
   </div>
 </template>
 <script>
-import api from '@/service/api';
-import dataService from '@/service/lotteryService';
+import api from '@/service/api'
+import dataService from '@/service/lotteryService'
+import fileService from '@/service/fileService'
 import util from '@/util/'
 export default {
 
@@ -153,6 +155,9 @@ export default {
     })
   },
   methods: {
+    getImgUrl(img){
+      return fileService.getImgUrl(img)
+    },
     formatDate(date) {
       return util.formatDate(date)
     },
@@ -283,6 +288,36 @@ export default {
         }).catch(err => {
           this.$message({
             message: '删除请求失败',
+            type: 'error'
+          })
+        })
+      }).catch(() => {
+
+      })
+    },
+    clearLotteryWinner(index){
+      this.$confirm('此操作将永久重置获奖数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let id = this.tableData[index]._id
+        dataService.clearLotteryWinner(id).then(res => {
+          console.log('====res====', res)
+          if (res.data.success) {
+            this.$message({
+              message: '已重置获奖数据',
+              type: 'success'
+            })
+          } else {
+            this.$message({
+              message: '重置失败',
+              type: 'warning'
+            })
+          }
+        }).catch(err => {
+          this.$message({
+            message: '重置请求失败',
             type: 'error'
           })
         })

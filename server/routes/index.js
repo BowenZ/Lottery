@@ -97,18 +97,47 @@ router.delete('/lottery/:id', (req, res) => {
 })
 
 router.put('/lottery/:id', (req, res) => {
+	console.log('====req.body====', req.body)
 	if(req.params){
-		Lottery.changeState(req.params.id, req.body.state).then(data => {
-			res.json({
-				success: true,
-				data
+		if(req.body.state){
+			Lottery.changeState(req.params.id, req.body.state).then(data => {
+				res.json({
+					success: true,
+					data
+				})
+			}).catch(err => {
+				res.json({
+					success: false,
+					err
+				})
 			})
-		}).catch(err => {
-			res.json({
-				success: false,
-				err
+		}else if(req.body.winner){
+			Lottery.setWinner(req.body.prizeId, JSON.parse(req.body.winner)).then(doc => {
+				res.json({
+					success: true,
+					data: doc
+				})
+			}).catch(err => {
+				res.json({
+					success: false,
+					err
+				})
 			})
-		})
+		}
+		let param = req.query.param
+		if(param == 'clearWinner'){
+			Lottery.clearWinner(req.params.id).then(doc => {
+				res.json({
+					success: true,
+					data: doc
+				})
+			}).catch(err => {
+				res.json({
+					success: false,
+					err
+				})
+			})
+		}
 	}else{
 		res.json({
 			success: false,
