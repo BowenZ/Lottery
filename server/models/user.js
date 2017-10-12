@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
 	state: {
 		type: Number,
 		default: 0
-	}
+	},
+	from: String
 })
 
 const UserModel = mongoose.model('User', userSchema)

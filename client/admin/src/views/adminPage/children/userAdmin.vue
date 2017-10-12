@@ -51,9 +51,6 @@ export default {
     }).catch(err => {
       this.tableLoading = false
     })
-    userService.rigister().then(res=>{
-    	console.log('====res====', res)
-    })
   },
   methods: {
     formatDate(date) {

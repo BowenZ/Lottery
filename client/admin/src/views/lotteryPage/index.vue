@@ -225,6 +225,10 @@ export default {
     lotteryService.findActiveLottery().then(res => {
       let result = res.data
       if (result.success) {
+      	if(!result.data){
+      		this.ended = true
+          this.showSpecial = true
+      	}
         this.lottery = result.data
         this.loadStep++
       }

@@ -11,7 +11,8 @@ router.post('/init', function(req, res, next) {
 router.post('/', (req, res) => {
 	let params = {
 		name: req.body.name,
-		tel: req.body.tel
+		tel: req.body.tel,
+		from: req.body.from
 	}
 	User.findOneUser({
 		tel: params.tel
@@ -23,6 +24,7 @@ router.post('/', (req, res) => {
 				alreadyIn: true
 			})
 		} else {
+			console.log('====params====', params)
 			let user = new User(params)
 			user.save().then(data => {
 				// newUsers.push(data)
