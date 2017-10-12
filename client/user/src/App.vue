@@ -75,7 +75,7 @@ let ajax = axios.create({
     'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
   }
 })
-let URL = 'http://192.168.1.152:3000/'
+let URL = 'http://101.132.26.45:3000/'
 export default {
   name: 'app',
   components: {},
