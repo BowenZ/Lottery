@@ -1,7 +1,9 @@
 <template>
 <div id="app">
   <div class="bg">
-    <img src="~@/assets/bg.jpg"
+    <img v-if="!lotteryEnded" src="~@/assets/bg.jpg"
+         alt="">
+    <img v-else src="~@/assets/bg2.jpg"
          alt="">
   </div>
   <div class="join"
@@ -22,15 +24,38 @@
   </div>
   <div class="waiting shadow-box"
        v-if="user && !lotteryEnded">
-    <h2>排队中</h2>
+    <h2>参与成功!</h2>
     <h3>{{user.tel}}</h3>
     <p>请关注大屏抽奖信息</p>
   </div>
-  <div class="ended shadow-box"
+  <!-- <div class="ended shadow-box"
        v-if="lotteryEnded">
     <h2>活动已结束</h2>
     <h3 v-if="user">{{user.tel}}</h3>
-    <p>如需领取奖励，请前往外场对应展位核销并登记信息。</p>
+    <p>如需领取奖励，请前往外场一步用车工作处兑奖。</p>
+  </div> -->
+  <div class="register" v-if="lotteryEnded">
+    <div class="input-container shadow-box" v-if="!registerEnded">
+      <div class="tel-input">
+        <input type="tel"
+               v-model="userTel"
+               placeholder="请输入您的手机号">
+      </div>
+      <a href="#"
+         @click="handleClickRegister">注册账号</a>
+    </div>
+    <div class="register-success shadow-box" v-if="registerEnded">
+      <h2>参与成功</h2>
+      <h3>{{userTel}}</h3>
+      <p>新用户请于明日10时从您的钱包-优惠券处查看大礼包</p>
+      <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.usercar.yongche" class="download-btn">
+        即刻下载APP，享受便捷出行
+      </a>
+    </div>
+    <div class="bottom-text">
+      <img src="~@/assets/copy2.png"
+           alt="">
+    </div>
   </div>
 </div>
 
@@ -38,6 +63,7 @@
 
 <script>
 import axios from 'axios';
+import qs from 'qs'
 import { Toast,Indicator } from 'mint-ui';
 
 let ajax = axios.create({
@@ -57,7 +83,8 @@ export default {
     return {
       userTel: '',
       user: null,
-      lotteryEnded: false
+      lotteryEnded: false,
+      registerEnded: false,
     }
   },
   methods: {
@@ -73,6 +100,7 @@ export default {
       return reg.test(this.userTel)
     },
     handleClickJoin() {
+      
       if (!this.checkTel()) {
         Toast({
           message: '您输入的手机号有误',
@@ -81,9 +109,9 @@ export default {
       } else {
         Indicator.open('加载中...')
         axios.post(URL + 'user', {
-          tel: this.userTel
+          tel: this.userTel,
+          from: 'lottery'
         }).then(res => {
-          console.log('====res====', res)
           let result = res.data
           if (result.success) {
             if (result.alreadyIn) {
@@ -96,6 +124,11 @@ export default {
                 message: '参与成功',
                 position: 'bottom'
               })
+              axios.post('http://101.132.26.45:8085/invite/regist-in-phone.html', qs.stringify({
+                phone: this.userTel
+              })).then(res => {
+                console.log('====user====', res)
+              })
             }
             this.user = result.data
             localStorage.setItem('user', JSON.stringify(result.data))
@@ -105,13 +138,48 @@ export default {
           Indicator.close()
         })
       }
+    },
+    handleClickRegister(){
+      if (!this.checkTel()) {
+        Toast({
+          message: '您输入的手机号有误',
+          position: 'bottom'
+        })
+      } else {
+        Indicator.open('加载中...')
+        axios.post('http://101.132.26.45:8085/invite/regist-in-phone.html', qs.stringify({
+          phone: this.userTel
+        })).then(res => {
+          Indicator.close()
+          console.log('====user====', res)
+          if(res.data.code == 0){
+            this.registerEnded = true
+            Toast({
+              message: '恭喜您注册成功'
+            })
+            axios.post(URL + 'user', {
+              tel: this.userTel,
+              from: '555coupon'
+            }).then(res => {
+              console.log('====mongo====', res)
+            })
+          }else{
+            Toast({
+              message: res.data.msg || '注册失败'
+            })
+            if(res.data.msg == '该用户已注册'){
+              this.registerEnded = true
+            }
+          }
+        }).catch(err => {
+          Indicator.close()
+        })
+      }
     }
   },
   created() {
     this.user = this.getUser()
-    console.log('====user====', this.user)
     axios.get(URL + 'lottery?type=active').then(res => {
-      console.log('====res====', res)
       let result = res.data
       if (result.success) {
         if (!result.data) {
@@ -133,9 +201,9 @@ export default {
     })
   },
   mounted() {
-    if (window.innerHeight / window.innerWidth < 1.46) {
+    if (window.innerHeight / window.innerWidth < 1.5) {
       this.$el.className = 'tiny'
-    } else if (window.innerHeight / window.innerWidth < 1.55) {
+    } else if (window.innerHeight / window.innerWidth < 1.58) {
       this.$el.className = 'small'
     }
   }
@@ -165,6 +233,7 @@ body {
   width: 100%;
   height: 100%;
   background-color: $light;
+  overflow: auto;
 }
 
 .bg {
@@ -215,7 +284,8 @@ body {
 
 .bottom-text {
   width: 100%;
-  margin-top: 8%;
+  margin-top: 6%;
+  margin-bottom: 2%;
   img {
     display: block;
     width: 100%;
@@ -225,19 +295,49 @@ body {
 .waiting, .ended {
   background-color: #fff;
   text-align: center;
-  padding: 8vw 0;
+  padding: 7vw 0 10vw;
   h2 {
-    margin: 0;
+    margin: 0 0 3vw;
     font-size: 7vw;
   }
   h3 {
-    margin: 4vw 0 1vw;
+    margin: 0;
     font-weight: normal;
-    font-size: 5vw;
+    font-size: 5.5vw;
   }
   p {
-    margin: 0;
+    margin: 3vw 0 0;
     font-size: 3.6vw;
+  }
+}
+
+.register{
+  .register-success{
+    background-color: #fff;
+    text-align: center;
+    padding: 3vw 0 0;
+    h2 {
+      margin: 0 0 2vw;
+      font-size: 7vw;
+    }
+    h3 {
+      margin: 0;
+      font-weight: normal;
+      font-size: 5.5vw;
+    }
+    p {
+      margin: 2vw 0 3vw;
+      font-size: 3.6vw;
+    }
+    .download-btn{
+      width: 100%;
+      height: 11vw;
+      line-height: 11vw;
+      background-color: $yellow;
+      display: block;
+      text-decoration: none;
+      color: $dark
+    }
   }
 }
 

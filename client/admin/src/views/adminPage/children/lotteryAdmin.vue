@@ -5,7 +5,7 @@
         <el-button type="primary" icon="plus" @click="dialogVisible = true">新增抽奖活动</el-button>
       </div>
       <div class="content">
-        <el-table :data="tableData" style="width: 100%">
+        <el-table :data="tableData" style="width: 100%" border v-loading="tableLoading">
           <el-table-column type="expand">
             <template scope="scope">
               <div class="lottery-detail">
@@ -31,23 +31,24 @@
           </el-table-column>
           <el-table-column label="奖品等级" prop="level" width="100">
           </el-table-column>
-          <el-table-column label="创建时间" prop="createTime" width="220">
+          <el-table-column label="创建时间" prop="createTime" width="240">
             <template scope="scope">
               {{formatDate(scope.row.createTime)}}
             </template>
           </el-table-column>
-          <el-table-column label="状态">
+          <el-table-column label="状态" width="100">
             <template scope="scope">
               <el-tag v-if="scope.row.state == 0">未开始</el-tag>
               <el-tag v-if="scope.row.state == 1" type="success">已开始</el-tag>
               <el-tag v-if="scope.row.state == 2" type="gray">已停止</el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="150">
+          <el-table-column label="操作" width="220">
             <template scope="scope">
               <el-button type="text" v-if="scope.row.state != 1" @click="startLottery(scope.$index)">开始</el-button>
               <el-button type="text" v-if="scope.row.state == 1" @click="stopLottery(scope.$index)">停止</el-button>
               <el-button type="text" @click="clearLotteryWinner(scope.$index)">重置</el-button>
+              <el-button type="text" @click="showLotteryWinner(scope.$index)">查看结果</el-button>
               <el-button type="text" @click="deleteLottery(scope.$index)">删除</el-button>
             </template>
           </el-table-column>
@@ -94,9 +95,26 @@
         </div>
       </el-form>
       <span slot="footer" class="dialog-footer">
-	    <el-button @click="dialogVisible = false">取 消</el-button>
-	    <el-button type="primary" @click="addLottery">确 定</el-button>
-	  </span>
+  	    <el-button @click="dialogVisible = false">取 消</el-button>
+  	    <el-button type="primary" @click="addLottery">确 定</el-button>
+  	  </span>
+    </el-dialog>
+    <el-dialog title="查看中奖结果" :visible.sync="winnerVisible" size="small">
+      <div class="final-winners"
+             v-if="currentLottery">
+        <div class="winner-container"
+             v-for="(item, index) in currentLottery.prizes"
+             :key="index">
+          <h4>{{chineseNumber[item.level-1]}}等奖：{{item.prizeTitle}}</h4>
+          <ul>
+            <li v-for="(winner, winnerIndex) in item.winners"
+                :key="winnerIndex">{{winner.tel}}</li>
+          </ul>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="winnerVisible=false">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -139,7 +157,10 @@ export default {
         message: '此项为必填项',
         trigger: 'blur'
       }],
-      tableData: []
+      tableData: [],
+      winnerVisible: false,
+      currentLottery: null,
+      tableLoading: true
     }
   },
   created() {
@@ -147,11 +168,14 @@ export default {
       this.addPrize()
     }
     dataService.findAllLottery().then(res => {
+      this.tableLoading = false
       console.log('====res====', res)
       let result = res.data
       if (result.success) {
         this.tableData = result.data
       }
+    }).catch(err => {
+      this.tableLoading = false
     })
   },
   methods: {
@@ -200,14 +224,15 @@ export default {
         content: '',
         companyName: '',
         companyLogo: '',
-        level: 3,
+        level: 1,
         prizes: []
       }
+      this.oldLevel = 1
       this.$refs.uploader.forEach((item, index) => {
         item.clearFiles()
       })
       this.$refs.logoUploader.clearFiles()
-      this.changePrizes()
+      this.addPrize()
     },
     addLottery() {
       this.$refs.uploader.forEach((item, index) => {
@@ -221,7 +246,9 @@ export default {
         item.level = index + 1
       })
       console.log('====this.formModel====', this.formModel)
+      this.tableLoading = true
       dataService.addLottery(JSON.stringify(this.formModel)).then(res => {
+        this.tableLoading = false
         console.log('====res====', res)
         let result = res.data
         if (result.success) {
@@ -234,6 +261,7 @@ export default {
           this.clearForm()
         }
       }).catch(err => {
+        this.tableLoading = false
         this.$message({
           message: '添加请求失败',
           type: 'error'
@@ -249,22 +277,30 @@ export default {
         return
       }
       let id = this.tableData[index]._id
+      this.tableLoading = true
       dataService.startLottery(id).then(res => {
+        this.tableLoading = false
         console.log('========', res)
         let result = res.data
         if (result.success) {
           this.tableData[index].state = 1
         }
+      }).catch(err => {
+        this.tableLoading = false
       })
     },
     stopLottery(index) {
       let id = this.tableData[index]._id
+      this.tableLoading = true
       dataService.stopLottery(id).then(res => {
+        this.tableLoading = false
         console.log('========', res)
         let result = res.data
         if (result.success) {
           this.tableData[index].state = 2
         }
+      }).catch(err => {
+        this.tableLoading = false
       })
     },
     deleteLottery(index) {
@@ -302,7 +338,9 @@ export default {
         type: 'warning'
       }).then(() => {
         let id = this.tableData[index]._id
+        this.tableLoading = true
         dataService.clearLotteryWinner(id).then(res => {
+          this.tableLoading = false
           console.log('====res====', res)
           if (res.data.success) {
             this.$message({
@@ -316,6 +354,7 @@ export default {
             })
           }
         }).catch(err => {
+          this.tableLoading = false
           this.$message({
             message: '重置请求失败',
             type: 'error'
@@ -324,32 +363,46 @@ export default {
       }).catch(() => {
 
       })
+    },
+    showLotteryWinner(index){
+      this.currentLottery = this.tableData[index]
+      this.winnerVisible = true
     }
   }
 };
 
 </script>
 <style lang="scss">
-.prize-container {
-  .prize {
-    margin: 10px;
-    h3 {
-      font-size: 16px;
-      font-weight: bold;
+.lottery-admin{
+  .prize-container {
+    .prize {
+      margin: 10px;
+      h3 {
+        font-size: 16px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .lottery-detail {
+    max-height: 500px;
+    overflow: auto;
+    li {
+      margin-bottom: 30px;
+    }
+    img {
+      max-width: 50%;
+      display: block;
+    }
+  }
+
+  .final-winners{
+    ul{
+      list-style: none;
+      padding-left: 20px;
     }
   }
 }
 
-.lottery-detail {
-  max-height: 500px;
-  overflow: auto;
-  li {
-    margin-bottom: 30px;
-  }
-  img {
-    max-width: 50%;
-    display: block;
-  }
-}
 
 </style>

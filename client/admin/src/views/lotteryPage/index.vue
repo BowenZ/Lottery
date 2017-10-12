@@ -1,9 +1,13 @@
 <template>
-<div class="lottery-page">
+<div class="lottery-page"
+     v-loading="loading"
+     element-loading-text="正在读取数据，请稍后...">
   <div class="bg-wrapper"></div>
   <div class="logo">
-    <img src="~@/assets/img/logo.png"
-         alt="">
+    <router-link :to="{name: 'lotteryAdmin'}">
+      <img src="~@/assets/img/logo.png"
+           alt="">
+    </router-link>
   </div>
   <div class="lottery-wrapper">
     <div class="title">
@@ -15,16 +19,24 @@
       <div class="user-list">
         <h3>当前参与人数</h3>
         <h4>
-						<span>{{joinCount}}</span>人
-					</h4>
-        <div class="user-pool"
+					<span>{{joinCount}}</span>人
+				</h4>
+        <div class="user-pool-container"
              v-show="!running">
-          <ul v-if="this.users">
-            <li v-for="(user, index) in users"
-                :key="index">
-              {{user.tel}}
-            </li>
-          </ul>
+          <div class="user-pool">
+            <ul v-if="this.users">
+              <li v-for="(user, index) in users"
+                  :key="index">
+                {{user.tel}}
+              </li>
+            </ul>
+          </div>
+          <img class="cover cover-top"
+               src="~@/assets/img/cover.png"
+               alt="">
+          <img class="cover cover-bottom"
+               src="~@/assets/img/cover.png"
+               alt="">
         </div>
         <div class="lottery-box"
              v-if="running && randomIndexList">
@@ -65,18 +77,19 @@
         <div class="winner-list"
              :class="getWinnerFontSize()">
           <div v-for=" (winner, index) in currentWinner"
-               :key="index" v-html="hideTel(winner.tel)"></div>
+               :key="index"
+               v-html="hideTel(winner.tel)"></div>
         </div>
         <p v-if="currentWinner.length>1">恭喜以上{{chineseNumber[currentWinner.length-1]}}位获得</p>
         <p v-if="currentWinner.length==1">恭喜该用户获得</p>
         <h3>{{currentPrize.prizeTitle}}</h3>
         <a href="#"
            class="primary-btn next-btn"
-           @click="nextLottery()">确认</a>
+           @click.prevent.stop="nextLottery">确认</a>
       </div>
       <div class="final-result"
-           v-if="ended">
-        <h3>所有奖项已抽取完毕</h3>
+           v-if="ended && !showSpecial">
+        <h3 @click="showSpecial = true">所有奖项已抽取完毕</h3>
         <h4>请以上中奖人员，前往外场一步用车工作处兑奖</h4>
         <div class="final-winners"
              v-if="lottery && lottery.prizes.length !=3">
@@ -86,7 +99,8 @@
             <h4>{{chineseNumber[item.level-1]}}等奖：{{item.prizeTitle}}</h4>
             <ul>
               <li v-for="(winner, winnerIndex) in item.winners"
-                  :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                  :key="winnerIndex"
+                  v-html="hideTel(winner.tel)"></li>
             </ul>
           </div>
         </div>
@@ -97,14 +111,16 @@
               <h4>一等奖：{{lottery.prizes[0].prizeTitle}}</h4>
               <ul>
                 <li v-for="(winner, winnerIndex) in lottery.prizes[0].winners"
-                    :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                    :key="winnerIndex"
+                    v-html="hideTel(winner.tel)"></li>
               </ul>
             </div>
             <div class="winner-container">
               <h4>二等奖：{{lottery.prizes[1].prizeTitle}}</h4>
               <ul>
                 <li v-for="(winner, winnerIndex) in lottery.prizes[1].winners"
-                    :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                    :key="winnerIndex"
+                    v-html="hideTel(winner.tel)"></li>
               </ul>
             </div>
           </div>
@@ -113,9 +129,30 @@
               <h4>三等奖：{{lottery.prizes[2].prizeTitle}}</h4>
               <ul>
                 <li v-for="(winner, winnerIndex) in lottery.prizes[2].winners"
-                    :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                    :key="winnerIndex"
+                    v-html="hideTel(winner.tel)"></li>
               </ul>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="special-prize"
+           v-if="showSpecial">
+        <h3>特等奖</h3>
+        <p>今日参与抽奖活动的创业者</p>
+        <p>都将获得价值<span>555</span>元创业者激励礼券包！</p>
+        <div class="download-app">
+          <div class="qrcode">
+            <img src="~@/assets/img/qrcode.png"
+                 alt="">
+          </div>
+          <div class="text">
+            <p>
+              下载一步用车App， 
+            </p>
+            <p>
+            	明天十点查收礼券包
+            </p>
           </div>
         </div>
       </div>
@@ -156,7 +193,10 @@ export default {
       ],
       showResult: false,
       ended: false,
-      currentWinner: []
+      currentWinner: [],
+      loadStep: 0,
+      loading: true,
+      showSpecial: false
     }
   },
   computed: {
@@ -178,12 +218,15 @@ export default {
       if (result.success) {
         this.users = result.data
         this.joinCount = result.data.length
+        this.loadStep++
+        this.addNewUser()
       }
     })
     lotteryService.findActiveLottery().then(res => {
       let result = res.data
       if (result.success) {
         this.lottery = result.data
+        this.loadStep++
       }
       setTimeout(() => {
         if (!this.currentPrize) {
@@ -191,6 +234,14 @@ export default {
         }
       }, 10)
     })
+  },
+  watch: {
+    loadStep(step) {
+      if (step === 2) {
+        this.loading = false
+        this.checkOldWinner()
+      }
+    }
   },
   mounted() {
     window.addEventListener('keyup', e => {
@@ -203,7 +254,13 @@ export default {
       }
     })
     setTimeout(() => {
-      this.autoScrollPool(0)
+      this.autoScrollPool()
+      if (window.innerWidth / window.innerHeight > 1.69) {
+        this.$el.classList.add('narrow')
+      }
+      if (window.innerWidth / window.innerHeight > 2.9) {
+        this.$el.classList.add('super-narrow')
+      }
     }, 500)
 
   },
@@ -211,9 +268,32 @@ export default {
     this.sse && this.sse.close()
   },
   methods: {
-  	hideTel(tel){
-  		return tel.substr(0, 3) + '<span class="hide-tel">一步用车</span>' + tel.substr(-4, 4)
-  	},
+    addNewUser() {
+      setTimeout(() => {
+        if (!this.running && this.joinCount > 16) {
+          this.joinCount += Math.floor(Math.random() * 5)
+          this.addNewUser()
+        }
+      }, Math.floor(Math.random() * 3 + 2) * 1000)
+    },
+    checkOldWinner() {
+      if (this.lottery.prizes.some(item => item.winners.length > 0)) {
+        let oldWinners = []
+        this.lottery.prizes.forEach(item => {
+          if (item.winners.length > 0) {
+            oldWinners = oldWinners.concat(item.winners)
+          }
+        })
+        this.users = this.users.filter(item => {
+          return !oldWinners.some(winner => {
+            return winner._id === item._id
+          })
+        })
+      }
+    },
+    hideTel(tel) {
+      return tel.substr(0, 3) + '<span class="hide-tel">一步用车</span>' + tel.substr(-4, 4)
+    },
     getWinnerFontSize() {
       let level = this.currentPrize.level
       if (level > 2) {
@@ -241,14 +321,16 @@ export default {
     },
     autoScrollPool() {
       let $pool = this.$el.querySelector('.user-pool')
+      let scrollStep = 1
       let timer = setInterval(() => {
         if (!$pool) {
           return
         }
         if ($pool.clientHeight + $pool.scrollTop === $pool.scrollHeight) {
-          $pool.scrollTo(0, 0)
+          scrollStep = 0
+          $pool.scrollTop = 0
         }
-        $pool.scrollBy(0, 1)
+        $pool.scrollTop = scrollStep++
       }, 20)
     },
     getRandomIndex(length, count) {
@@ -267,14 +349,21 @@ export default {
       if (!this.currentPrize) {
         return
       }
-      let length = this.users.length
-      if (length < this.currentPrize.number) {
+      let userLength = this.users.length
+      if (!userLength || userLength < 1) {
+        this.$message({
+          message: '参与人数过少',
+          type: 'error'
+        })
+      }
+      if (userLength < this.currentPrize.number) {
         alert('参与人数小于中奖人数')
         return
       }
+
       this.running = true
       this.lotteryTimer = setInterval(() => {
-        this.randomIndexList = this.getRandomIndex(length, this.currentPrize.number)
+        this.randomIndexList = this.getRandomIndex(userLength, this.currentPrize.number)
       }, 80)
     },
     stopLottery() {
@@ -294,7 +383,6 @@ export default {
       let prizeId = this.currentPrize._id
       this.currentPrize.winners = winnerList
 
-      console.log('====lottery====', this.lottery)
       lotteryService.setLotteryWinner(this.lottery._id, prizeId, JSON.stringify(winnerList)).then(res => {
         console.log('====set winner====', res)
       })
@@ -327,6 +415,9 @@ export default {
   overflow: hidden;
   position: absolute;
   background: linear-gradient(to bottom, #0c5394 0%, #00386a 100%);
+  ul {
+    list-style-type: none;
+  }
   .bg-wrapper {
     position: absolute;
     width: 100%;
@@ -342,6 +433,7 @@ export default {
       display: block;
       left: 4%;
       top: 3%;
+      z-index: 9;
     }
   }
   .primary-btn {
@@ -358,7 +450,7 @@ export default {
     color: #fff;
     font-size: 1.6rem;
   }
-  .hide-tel{
+  .hide-tel {
     font-size: 0.8em;
     vertical-align: baseline;
     color: #b8d6f1;
@@ -391,6 +483,7 @@ export default {
     .content {
       flex: 1;
       display: flex;
+      overflow: hidden;
       .user-list {
         flex: 1;
         margin-right: 5%;
@@ -415,19 +508,38 @@ export default {
             color: #fff;
           }
         }
-        .user-pool {
+        .user-pool-container {
           flex: 1;
           font-size: 2rem;
           margin-top: 1rem;
           margin-bottom: 3rem;
           overflow: hidden;
+          position: relative;
+          .user-pool {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+          }
+          .cover {
+            position: absolute;
+            width: 100%;
+            height: auto;
+            left: 0;
+            &.cover-top {
+              top: 0;
+            }
+            &.cover-bottom {
+              bottom: 0;
+              transform: rotate(180deg);
+            }
+          }
         }
         .lottery-box {
           flex: 1;
           font-size: 2rem;
           overflow: hidden;
           display: flex;
-          padding-bottom: 15%;
+          padding-bottom: 1rem;
           ul {
             flex: 1;
             display: flex;
@@ -513,10 +625,11 @@ export default {
         h3 {
           font-size: 1.8rem;
           margin: 1rem 0 1.4rem;
+          font-weight: normal;
         }
         .next-btn {
           max-width: 20rem;
-          margin: auto;
+          margin: 0 auto 1rem;
           font-size: 1.5rem;
           height: 3rem;
           line-height: 3rem;
@@ -554,7 +667,121 @@ export default {
           }
         }
       }
+      .special-prize {
+  	    width: 100%;
+  	   	display: flex;
+   	    flex-direction: column;
+        h3 {
+          font-size: 2.8rem;
+    			margin: 2rem 0 1.5rem;
+        }
+        p {
+          font-size: 1.5rem;
+    			margin: 0.5rem 0;
+          span {
+      	    font-size: 2.6rem;
+				    margin: 0 0.5rem;
+				    vertical-align: middle;
+            color: #fdd000;
+          }
+        }
+        .download-app{
+    	    flex: 1;
+			    display: flex;
+			    width: 50%;
+			    margin: auto;
+			    justify-content: center;
+			    align-items: center;
+			    .qrcode{
+	    	    max-width: 10rem;
+	    	    img{
+	    	    	display: block;
+    					width: 100%;
+	    	    }
+			    }
+			    .text{
+	    	    padding-left: 2rem;
+	    	    p{
+  	    	    font-size: 1.3rem;
+	    	    }
+			    }
+        }
+      }
     }
+  }
+}
+
+.lottery-page.narrow {
+  .lottery-wrapper .result-container .final-result {
+    >h3 {
+      margin: 0;
+    }
+    >h4 {
+      margin: 1rem 0 0;
+    }
+  }
+}
+
+.lottery-page.super-narrow {
+  .primary-btn {
+    border-radius: 0.3rem;
+  }
+  .lottery-wrapper {
+    padding: 2rem;
+    .title h1 {
+      font-size: 2.3rem;
+      margin-top: 0.5rem;
+    }
+    .content .user-list {
+      h4 {
+        margin-bottom: 1rem;
+      }
+      .user-pool-container {
+        margin-top: 0rem;
+        margin-bottom: 1rem;
+      }
+      .user-pool {
+        margin: 0 0 2rem;
+      }
+    }
+    .result-container {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      .final-result {
+        h3 {
+          margin: 1rem 0 0;
+        }
+        h4 {
+          margin: 1rem 0 0;
+        }
+        .winner-container h4 {
+          margin: 2rem 0 1rem;
+          ;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  html {
+    font-size: 10px;
+  }
+  .lottery-page .logo img {
+    width: 13rem;
+    left: 2%;
   }
 }
 </style>

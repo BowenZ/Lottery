@@ -21,7 +21,7 @@ UserModel.findOneUser = function(param = {}){
 }
 
 UserModel.findAll = function(param = {}) {
-	return this.find(param)
+	return this.find(param).sort({createTime: -1})
 }
 
 UserModel.clear = function() {
@@ -58,6 +58,12 @@ UserModel.findRandom = function() {
 
 UserModel.changeState = function(id, state) {
 	return this.update()
+}
+
+UserModel.deleteOne = function(id){
+	return this.remove({
+		_id: ObjectID(id)
+	})
 }
 
 module.exports = UserModel

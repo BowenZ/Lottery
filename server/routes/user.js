@@ -126,4 +126,20 @@ router.delete('/', (req, res) => {
 	})
 })
 
+router.delete('/:id', (req, res) => {
+	let id = req.params.id
+	console.log('====id====', id)
+	User.deleteOne(id).then(data => {
+		res.json({
+			success: true,
+			data
+		})
+	}).catch(err => {
+		res.json({
+			success: false,
+			err
+		})
+	})
+})
+
 module.exports = router;

@@ -1,6 +1,7 @@
 import adminPage from '@/views/adminPage/'
-import lotteryAdmin from '@/views/adminPage/children/lotteryAdmin'
 import startLottery from '@/views/lotteryPage/'
+import lotteryAdmin from '@/views/adminPage/children/lotteryAdmin'
+import userAdmin from '@/views/adminPage/children/userAdmin'
 
 export default {
   path: '/admin',
@@ -12,7 +13,17 @@ export default {
   children: [{
   	path: 'lotteryAdmin',
   	name: 'lotteryAdmin',
+    meta: {
+      requireLogin: true
+    },
   	component: lotteryAdmin
+  }, {
+  	path: 'userAdmin',
+  	name: 'userAdmin',
+    meta: {
+      requireLogin: true
+    },
+  	component: userAdmin
   }]
 }
 

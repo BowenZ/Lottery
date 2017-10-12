@@ -1,4 +1,4 @@
-const URL = 'http://localhost:3000'
+const URL = 'http://192.168.1.152:3000'
 
 export default {
 	BASE: URL,

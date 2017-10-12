@@ -13,9 +13,11 @@ export default new Vuex.Store({
   mutations: {
   	login(state, user){
   		state.user = user
+      sessionStorage.setItem('user', JSON.stringify(user))
   	},
   	logout(state){
   		state.user = null
+      sessionStorage.removeItem('user')
   	}
   },
   modules: {
