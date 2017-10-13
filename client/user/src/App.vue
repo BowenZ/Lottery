@@ -124,7 +124,7 @@ export default {
                 message: '参与成功',
                 position: 'bottom'
               })
-              axios.post('http://101.132.26.45:8085/invite/regist-in-phone.html', qs.stringify({
+              axios.post('http://wx.1byongche.com/invite/regist-in-phone.html', qs.stringify({
                 phone: this.userTel
               })).then(res => {
                 console.log('====user====', res)
@@ -147,7 +147,7 @@ export default {
         })
       } else {
         Indicator.open('加载中...')
-        axios.post('http://101.132.26.45:8085/invite/regist-in-phone.html', qs.stringify({
+        axios.post('http://wx.1byongche.com/invite/regist-in-phone.html', qs.stringify({
           phone: this.userTel
         })).then(res => {
           Indicator.close()
