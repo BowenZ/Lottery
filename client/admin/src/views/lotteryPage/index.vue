@@ -142,18 +142,7 @@
         <p>今日参与抽奖活动的创业者</p>
         <p>都将获得价值<span>555</span>元创业者激励礼券包！</p>
         <div class="download-app">
-          <div class="qrcode">
-            <img src="~@/assets/img/qrcode.png"
-                 alt="">
-          </div>
-          <div class="text">
-            <p>
-              下载一步用车App， 
-            </p>
-            <p>
-            	明天十点查收礼券包
-            </p>
-          </div>
+          请下载一步用车App， 明日10:00后查收礼券包
         </div>
       </div>
     </div>
@@ -443,16 +432,16 @@ export default {
   .primary-btn {
     display: block;
     width: 100%;
-    height: 4rem;
+    height: 6rem;
     border-radius: 1rem;
     overflow: hidden;
     background: #1466b2;
     box-shadow: 0 0 1rem rgba(0, 0, 0, .3);
     text-decoration: none;
-    line-height: 4rem;
+    line-height: 6rem;
     text-align: center;
     color: #fff;
-    font-size: 1.6rem;
+    font-size: 2.5rem;
   }
   .hide-tel {
     font-size: 0.8em;
@@ -470,18 +459,21 @@ export default {
     right: 0;
     margin: auto;
     color: #e8e8e8;
-    padding: 2% 2% 4%;
+    padding: 3% 2% 5%;
     display: flex;
     flex-direction: column;
     .title {
       text-align: center;
       h1 {
         font-weight: normal;
-        font-size: 2.5rem;
+        font-size: 4rem;
+        margin-top: 1rem;
+        margin-bottom: 0;
       }
       h2 {
         font-weight: normal;
-        font-size: 1.7rem;
+        font-size: 2.5rem;
+        margin-bottom: 4rem;
       }
     }
     .content {
@@ -501,20 +493,21 @@ export default {
         h3 {
           font-weight: normal;
           margin-bottom: 0;
+          font-size: 2rem;
         }
         h4 {
-          margin-top: 0.5rem;
-          font-size: 1.5rem;
+          margin-top: 1rem;
+          font-size: 2rem;
           font-weight: normal;
           span {
-            font-size: 4rem;
+            font-size: 5rem;
             font-weight: bold;
             color: #fff;
           }
         }
         .user-pool-container {
           flex: 1;
-          font-size: 2rem;
+          font-size: 3rem;
           margin-top: 1rem;
           margin-bottom: 3rem;
           overflow: hidden;
@@ -540,10 +533,10 @@ export default {
         }
         .lottery-box {
           flex: 1;
-          font-size: 2rem;
+          font-size: 3rem;
           overflow: hidden;
           display: flex;
-          padding-bottom: 1rem;
+          padding-bottom: 15%;
           ul {
             flex: 1;
             display: flex;
@@ -566,10 +559,10 @@ export default {
           .company-info {
             text-align: center;
             img {
-              width: 6rem;
+              width: 9rem;
             }
             p {
-              font-size: 1.3rem;
+              font-size: 2rem;
               margin: 1rem 0;
             }
           }
@@ -577,16 +570,16 @@ export default {
             flex: 1;
             margin-left: 7%;
             h3 {
-              font-size: 1.8rem;
+              font-size: 3rem;
               font-weight: normal;
             }
             p {
-              font-size: 1.5rem;
+              font-size: 2.2rem;
             }
           }
         }
         .start-btn {
-          margin-top: 2rem;
+          margin-top: 4rem;
           margin-bottom: 4rem;
         }
       }
@@ -607,36 +600,36 @@ export default {
         display: flex;
         flex-direction: column;
         .winner-list {
-          font-size: 2rem;
+          font-size: 3rem;
           flex: 1;
           display: flex;
           flex-direction: column;
           justify-content: center;
           &.size-1 {
-            font-size: 4rem;
+            font-size: 5rem;
           }
           &.size-2 {
-            font-size: 3rem;
+            font-size: 4rem;
           }
           >div {
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
           }
         }
         p {
-          font-size: 1.3rem;
+          font-size: 2rem;
           margin: 0;
         }
         h3 {
-          font-size: 1.8rem;
-          margin: 1rem 0 1.4rem;
+          font-size: 3rem;
+          margin: 1.2rem 0 2rem;
           font-weight: normal;
         }
         .next-btn {
           max-width: 20rem;
-          margin: 0 auto 1rem;
-          font-size: 1.5rem;
-          height: 3rem;
-          line-height: 3rem;
+          margin: 0 auto 2rem;
+          font-size: 2rem;
+			    height: 5rem;
+			    line-height: 5rem;
           border-radius: 0.3rem;
         }
       }
@@ -645,12 +638,14 @@ export default {
         display: flex;
         flex-direction: column;
         h3 {
-          font-size: 1.8rem;
+          font-size: 3rem;
           font-weight: normal;
+          margin-bottom: 0;
         }
         h4 {
           font-weight: lighter;
-          font-size: 1.3rem;
+          font-size: 2rem;
+          margin: 1.5rem 0 0.5rem;
         }
         .final-winners {
           flex: 1;
@@ -663,9 +658,12 @@ export default {
               list-style: none;
             }
             .winner-container {
+            	h4{
+        		    margin: 3rem 0 1.5rem;
+            	}
               li {
-                font-size: 1.8rem;
-                margin-bottom: 1rem;
+                font-size: 2.8rem;
+                margin-bottom: 1.5rem;
               }
             }
           }
@@ -675,47 +673,32 @@ export default {
   	    width: 100%;
   	   	display: flex;
    	    flex-direction: column;
+        justify-content: center;
+    		padding-bottom: 5rem;
         h3 {
-          font-size: 2.8rem;
-    			margin: 2rem 0 1.5rem;
+          font-size: 5rem;
+    			margin: 2rem 0;
         }
         p {
-          font-size: 1.5rem;
+          font-size: 2.5rem;
     			margin: 0.5rem 0;
           span {
-      	    font-size: 2.6rem;
-				    margin: 0 0.5rem;
+  	        font-size: 5rem;
+    				font-weight: bold;
 				    vertical-align: middle;
             color: #fdd000;
           }
         }
         .download-app{
-    	    flex: 1;
-			    display: flex;
-			    width: 50%;
-			    margin: auto;
-			    justify-content: center;
-			    align-items: center;
-			    .qrcode{
-	    	    max-width: 10rem;
-	    	    img{
-	    	    	display: block;
-    					width: 100%;
-	    	    }
-			    }
-			    .text{
-	    	    padding-left: 2rem;
-	    	    p{
-  	    	    font-size: 1.3rem;
-	    	    }
-			    }
+	        font-size: 2rem;
+    			margin-top: 2rem;
         }
       }
     }
   }
 }
 
-.lottery-page.narrow {
+/* .lottery-page.narrow {
   .lottery-wrapper .result-container .final-result {
     >h3 {
       margin: 0;
@@ -787,5 +770,5 @@ export default {
     width: 13rem;
     left: 2%;
   }
-}
+} */
 </style>

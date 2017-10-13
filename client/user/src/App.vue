@@ -125,7 +125,8 @@ export default {
                 position: 'bottom'
               })
               axios.post('http://wx.1byongche.com/invite/regist-in-phone.html', qs.stringify({
-                phone: this.userTel
+                phone: this.userTel,
+                certkey: '17e5a0d2e2387b35fd752b581634700a'
               })).then(res => {
                 console.log('====user====', res)
               })
@@ -148,7 +149,8 @@ export default {
       } else {
         Indicator.open('加载中...')
         axios.post('http://wx.1byongche.com/invite/regist-in-phone.html', qs.stringify({
-          phone: this.userTel
+          phone: this.userTel,
+          certkey: '17e5a0d2e2387b35fd752b581634700a'
         })).then(res => {
           Indicator.close()
           console.log('====user====', res)
