@@ -185,7 +185,8 @@ export default {
       currentWinner: [],
       loadStep: 0,
       loading: true,
-      showSpecial: false
+      showSpecial: false,
+      allWinners: []
     }
   },
   computed: {
@@ -208,7 +209,6 @@ export default {
         this.users = result.data
         this.joinCount = result.data.length
         this.loadStep++
-        this.addNewUser()
       }
     })
     lotteryService.findActiveLottery().then(res => {
@@ -220,6 +220,10 @@ export default {
       	}
         this.lottery = result.data
         this.loadStep++
+
+        setInterval(()=>{
+        	this.loadUser()
+        }, 15000)
       }
       setTimeout(() => {
         if (!this.currentPrize) {
@@ -261,6 +265,19 @@ export default {
     this.sse && this.sse.close()
   },
   methods: {
+  	loadUser(){
+  		userService.findAllUser().then(res => {
+	      let result = res.data
+	      if (result.success) {
+	        this.users = result.data.filter(item => {
+	        	return !this.allWinners.some(winner => {
+	            return winner._id === item._id
+	          })
+	        })
+	        this.joinCount = this.users.length + this.allWinners.length
+	      }
+	    })
+  	},
     addNewUser() {
       setTimeout(() => {
         if (!this.running && this.joinCount > 16) {
@@ -366,6 +383,7 @@ export default {
         return this.users[item]
       })
       this.currentWinner = winnerList
+      this.allWinners = this.allWinners.concat(winnerList)
       setTimeout(() => {
         this.users = this.users.filter(item => {
           return !winnerList.some(winner => {
