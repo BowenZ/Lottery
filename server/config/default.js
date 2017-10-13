@@ -5,5 +5,5 @@ module.exports = {
     key: 'lottery',
     maxAge: 2592000000
   },
-  mongodb: 'mongodb://localhost:27017/lottery'
+  mongodb: 'mongodb://yongche:5tgb6yhn@10.47.190.253:27018/yongche'
 };
