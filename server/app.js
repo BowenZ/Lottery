@@ -11,6 +11,7 @@ var cors = require('cors')
 var index = require('./routes/index');
 var user = require('./routes/user');
 var upload = require('./routes/upload');
+var weixin = require('./routes/weixin.js');
 
 var app = express();
 
@@ -36,6 +37,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/user', user);
 app.use('/upload', upload);
+app.use('/weixin', weixin);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
