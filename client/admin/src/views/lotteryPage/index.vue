@@ -1,142 +1,108 @@
 <template>
-<div class="lottery-page"
-     v-loading="loading"
-     element-loading-text="正在读取数据，请稍后...">
-  <div class="bg-wrapper"></div>
-  <div class="logo">
-    <router-link :to="{name: 'lotteryAdmin'}">
-      <img src="~@/assets/img/logo.png"
-           alt="">
-    </router-link>
-  </div>
-  <div class="lottery-wrapper">
-    <div class="title">
-      <h1>一步用车创业者激励大奖</h1>
-      <h2>创业并不孤独，一步与你同路</h2>
+  <div class="lottery-page" v-loading="loading" element-loading-text="正在读取数据，请稍后...">
+    <div class="bg-wrapper"></div>
+    <div class="logo">
+      <router-link :to="{name: 'lotteryAdmin'}">
+        <img :src="baseURL + lottery.companyLogo" alt="">
+      </router-link>
     </div>
-    <div class="content"
-         v-show="!showResult && !ended">
-      <div class="user-list">
-        <h3>当前参与人数</h3>
-        <h4>
-					<span>{{joinCount}}</span>人
-				</h4>
-        <div class="user-pool-container"
-             v-show="!running">
-          <div class="user-pool">
-            <ul v-if="this.users">
-              <li v-for="(user, index) in users"
-                  :key="index">
-                {{user.tel}}
+    <div class="lottery-wrapper">
+      <div class="title">
+        <h1>{{lottery.title}}</h1>
+        <h2>{{lottery.content}}</h2>
+      </div>
+      <div class="content" v-show="!showResult && !ended">
+        <div class="user-list">
+          <h3>当前参与人数</h3>
+          <h4>
+            <span>{{joinCount}}</span>人
+          </h4>
+          <div class="user-pool-container" v-show="!running">
+            <div class="user-pool">
+              <ul v-if="this.users">
+                <li v-for="(user, index) in users" :key="index">
+                  {{user.tel}}
+                </li>
+              </ul>
+            </div>
+            <img class="cover cover-top" src="~@/assets/img/cover.png" alt="">
+            <img class="cover cover-bottom" src="~@/assets/img/cover.png" alt="">
+          </div>
+          <div class="lottery-box" v-if="running && randomIndexList">
+            <ul>
+              <li v-for="(item, index) in randomIndexList" :key="index">
+                {{users[item] && users[item].tel}}
               </li>
             </ul>
           </div>
-          <img class="cover cover-top"
-               src="~@/assets/img/cover.png"
-               alt="">
-          <img class="cover cover-bottom"
-               src="~@/assets/img/cover.png"
-               alt="">
         </div>
-        <div class="lottery-box"
-             v-if="running && randomIndexList">
-          <ul>
-            <li v-for="(item, index) in randomIndexList"
-                :key="index">
-              {{users[item] && users[item].tel}}
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="prize-container"
-           v-if="lottery">
-        <div class="prize">
-          <div class="company-info">
-            <img :src="getImgUrl(lottery.companyLogo)"
-                 alt="">
-            <p>{{lottery.companyName}}</p>
-          </div>
-          <div class="prize-content"
-               v-if="currentPrize">
-            <h3>{{chineseNumber[currentPrize.level-1]}}等奖奖品：</h3>
-            <p>{{currentPrize.prizeTitle}}x{{currentPrize.number}}</p>
-          </div>
-        </div>
-        <a href="#"
-           class="start-btn primary-btn"
-           @click.prevent.stop="handleClickBtn">
-					<span v-if="running">停</span>
-					<span v-else>开始抽奖</span>
-				</a>
-      </div>
-    </div>
-    <div class="result-container"
-         v-if="showResult || ended">
-      <div class="current-winner"
-           v-if="showResult">
-        <div class="winner-list"
-             :class="getWinnerFontSize()">
-          <div v-for=" (winner, index) in currentWinner"
-               :key="index"
-               v-html="hideTel(winner.tel)"></div>
-        </div>
-        <p v-if="currentWinner.length>1">恭喜以上{{chineseNumber[currentWinner.length-1]}}位获得</p>
-        <p v-if="currentWinner.length==1">恭喜该用户获得</p>
-        <h3>{{currentPrize.prizeTitle}}</h3>
-        <a href="#"
-           class="primary-btn next-btn"
-           @click.prevent.stop="nextLottery">确认</a>
-      </div>
-      <div class="final-result"
-           v-if="ended && !showSpecial">
-        <h3 @click="showSpecial = true">所有奖项已抽取完毕</h3>
-        <h4>请以上中奖人员，前往外场一步用车工作处兑奖</h4>
-        <div class="final-winners"
-             v-if="lottery && lottery.prizes.length !=3">
-          <div class="winner-container"
-               v-for="(item, index) in lottery.prizes"
-               :key="index">
-            <h4>{{chineseNumber[item.level-1]}}等奖：{{item.prizeTitle}}</h4>
-            <ul>
-              <li v-for="(winner, winnerIndex) in item.winners"
-                  :key="winnerIndex"
-                  v-html="hideTel(winner.tel)"></li>
-            </ul>
-          </div>
-        </div>
-        <div class="final-winners"
-             v-if="lottery && lottery.prizes.length ==3">
-          <div class="winner-col">
-            <div class="winner-container">
-              <h4>一等奖：{{lottery.prizes[0].prizeTitle}}</h4>
-              <ul>
-                <li v-for="(winner, winnerIndex) in lottery.prizes[0].winners"
-                    :key="winnerIndex"
-                    v-html="hideTel(winner.tel)"></li>
-              </ul>
+        <div class="prize-container" v-if="lottery && currentPrize">
+          <div class="prize">
+            <div class="prize-info">
+              <img :src="baseURL + currentPrize.imgurl[0]" alt="">
+              <p>{{currentPrize.prizeContent}}</p>
             </div>
-            <div class="winner-container">
-              <h4>二等奖：{{lottery.prizes[1].prizeTitle}}</h4>
-              <ul>
-                <li v-for="(winner, winnerIndex) in lottery.prizes[1].winners"
-                    :key="winnerIndex"
-                    v-html="hideTel(winner.tel)"></li>
-              </ul>
+            <div class="prize-content" v-if="currentPrize">
+              <h3>{{chineseNumber[currentPrize.level-1]}}等奖奖品：</h3>
+              <p>{{currentPrize.prizeTitle}}</p>
             </div>
           </div>
-          <div class="winner-col">
-            <div class="winner-container">
-              <h4>三等奖：{{lottery.prizes[2].prizeTitle}}</h4>
-              <ul>
-                <li v-for="(winner, winnerIndex) in lottery.prizes[2].winners"
-                    :key="winnerIndex"
-                    v-html="hideTel(winner.tel)"></li>
-              </ul>
+          <a href="#" class="start-btn primary-btn" @click.prevent.stop="handleClickBtn">
+            <span v-if="running">停</span>
+            <span v-else>开始抽奖</span>
+          </a>
+        </div>
+      </div>
+      <div class="result-container" v-if="showResult || ended">
+        <div class="current-winner" v-if="showResult && currentPrize">
+          <div class="winner-list" :class="getWinnerFontSize()">
+            <div v-for=" (winner, index) in currentWinner" :key="index" v-html="hideTel(winner.tel)"></div>
+          </div>
+          <p v-if="currentWinner.length>1">恭喜以上{{chineseNumber[currentWinner.length-1]}}位获得</p>
+          <p v-if="currentWinner.length==1">恭喜该用户获得</p>
+          <h3>{{currentPrize.prizeTitle}}</h3>
+          <a href="#" class="primary-btn next-btn" @click.prevent.stop="nextLottery">确认</a>
+        </div>
+        <div class="final-result" v-if="ended && !showSpecial">
+          <!-- <h3 @click="showSpecial = true">所有奖项已抽取完毕</h3> -->
+          <h3>所有奖项已抽取完毕</h3>
+          <h4>请以上中奖人员，前到领奖台领奖</h4>
+          <div class="final-winners" v-if="lottery && lottery.prizes.length !=3">
+            <div class="winner-col" v-for="(item, index) in lottery.prizes" :key="index">
+              <div class="winner-container">
+                <h4>{{chineseNumber[item.level-1]}}等奖：{{item.prizeTitle}}</h4>
+                <ul>
+                  <li v-for="(winner, winnerIndex) in item.winners" :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="final-winners" v-if="lottery && lottery.prizes.length ==3">
+            <div class="winner-col">
+              <div class="winner-container">
+                <h4>一等奖：{{lottery.prizes[0].prizeTitle}}</h4>
+                <ul>
+                  <li v-for="(winner, winnerIndex) in lottery.prizes[0].winners" :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                </ul>
+              </div>
+              <div class="winner-container">
+                <h4>二等奖：{{lottery.prizes[1].prizeTitle}}</h4>
+                <ul>
+                  <li v-for="(winner, winnerIndex) in lottery.prizes[1].winners" :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                </ul>
+              </div>
+            </div>
+            <div class="winner-col">
+              <div class="winner-container">
+                <h4>三等奖：{{lottery.prizes[2].prizeTitle}}</h4>
+                <ul>
+                  <li v-for="(winner, winnerIndex) in lottery.prizes[2].winners" :key="winnerIndex" v-html="hideTel(winner.tel)"></li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="special-prize"
+        <!-- <div class="special-prize"
            v-if="showSpecial">
         <h3>特等奖</h3>
         <p>今日参与抽奖活动的创业者</p>
@@ -144,17 +110,16 @@
         <div class="download-app">
           请下载一步用车App， 明日10:00后查收礼券包
         </div>
+      </div> -->
       </div>
     </div>
   </div>
-</div>
-
 </template>
-
 <script>
 import userService from '@/service/userService';
 import lotteryService from '@/service/lotteryService';
 import fileService from '@/service/fileService';
+import { URL } from '@/service/api'
 export default {
 
   name: 'startLottery',
@@ -165,7 +130,7 @@ export default {
       users: [],
       randomIndexList: [],
       lotteryTimer: null,
-      lottery: null,
+      lottery: {},
       running: false,
       joinCount: '-',
       chineseNumber: [
@@ -186,7 +151,8 @@ export default {
       loadStep: 0,
       loading: true,
       showSpecial: false,
-      allWinners: []
+      allWinners: [],
+      baseURL: URL
     }
   },
   computed: {
@@ -214,16 +180,16 @@ export default {
     lotteryService.findActiveLottery().then(res => {
       let result = res.data
       if (result.success) {
-      	if(!result.data){
-      		this.ended = true
+        if (!result.data) {
+          this.ended = true
           this.showSpecial = true
-      	}
+        }
         this.lottery = result.data
         this.loadStep++
 
-        setInterval(()=>{
-        	this.loadUser()
-        }, 15000)
+          setInterval(() => {
+            this.loadUser()
+          }, 15000)
       }
       setTimeout(() => {
         if (!this.currentPrize) {
@@ -265,24 +231,24 @@ export default {
     this.sse && this.sse.close()
   },
   methods: {
-  	loadUser(){
-  		userService.findAllUser().then(res => {
-	      let result = res.data
-	      if (result.success) {
-	        this.users = result.data.filter(item => {
-	        	return !this.allWinners.some(winner => {
-	            return winner._id === item._id
-	          })
-	        })
-	        this.joinCount = this.users.length + this.allWinners.length
-	      }
-	    })
-  	},
-    addNewUser() {
+    loadUser() {
+      userService.findAllUser().then(res => {
+        let result = res.data
+        if (result.success) {
+          this.users = result.data.filter(item => {
+            return !this.allWinners.some(winner => {
+              return winner._id === item._id
+            })
+          })
+          this.joinCount = this.users.length + this.allWinners.length
+        }
+      })
+    },
+    addFakeNewUser() {
       setTimeout(() => {
         if (!this.running && this.joinCount > 16) {
           this.joinCount += Math.floor(Math.random() * 5)
-          this.addNewUser()
+          this.addFakeNewUser()
         }
       }, Math.floor(Math.random() * 3 + 2) * 1000)
     },
@@ -418,7 +384,6 @@ export default {
 };
 
 </script>
-
 <style lang="scss">
 .lottery-page {
   width: 100%;
@@ -440,7 +405,7 @@ export default {
   .logo {
     img {
       position: absolute;
-      width: 15rem;
+      width: 13rem;
       display: block;
       left: 4%;
       top: 3%;
@@ -471,13 +436,13 @@ export default {
   }
   .lottery-wrapper {
     position: absolute;
-    max-width: 1280px;
+    // max-width: 1280px;
     height: 100%;
     left: 0;
     right: 0;
     margin: auto;
     color: #e8e8e8;
-    padding: 3% 2% 5%;
+    padding: 3% 5% 5%;
     display: flex;
     flex-direction: column;
     .title {
@@ -500,6 +465,8 @@ export default {
       overflow: hidden;
       .user-list {
         flex: 1;
+        max-width: 600px;
+        margin-left: 5%;
         margin-right: 5%;
         background: #125696;
         box-shadow: 0 0 3rem rgba(0, 0, 0, .4);
@@ -574,10 +541,10 @@ export default {
         justify-content: center;
         .prize {
           display: flex;
-          .company-info {
+          .prize-info {
             text-align: center;
             img {
-              width: 9rem;
+              width: 20rem;
             }
             p {
               font-size: 2rem;
@@ -597,6 +564,7 @@ export default {
           }
         }
         .start-btn {
+          max-width: 550px;
           margin-top: 4rem;
           margin-bottom: 4rem;
         }
@@ -624,10 +592,10 @@ export default {
           flex-direction: column;
           justify-content: center;
           &.size-1 {
-            font-size: 5rem;
+            font-size: 4rem;
           }
           &.size-2 {
-            font-size: 4rem;
+            font-size: 3rem;
           }
           >div {
             margin-bottom: 1rem;
@@ -646,8 +614,8 @@ export default {
           max-width: 20rem;
           margin: 0 auto 2rem;
           font-size: 2rem;
-			    height: 5rem;
-			    line-height: 5rem;
+          height: 5rem;
+          line-height: 5rem;
           border-radius: 0.3rem;
         }
       }
@@ -676,9 +644,9 @@ export default {
               list-style: none;
             }
             .winner-container {
-            	h4{
-        		    margin: 3rem 0 1.5rem;
-            	}
+              h4 {
+                margin: 3rem 0 1.5rem;
+              }
               li {
                 font-size: 2.8rem;
                 margin-bottom: 1.5rem;
@@ -688,33 +656,35 @@ export default {
         }
       }
       .special-prize {
-  	    width: 100%;
-  	   	display: flex;
-   	    flex-direction: column;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
         justify-content: center;
-    		padding-bottom: 5rem;
+        padding-bottom: 5rem;
         h3 {
           font-size: 5rem;
-    			margin: 2rem 0;
+          margin: 2rem 0;
         }
         p {
           font-size: 2.5rem;
-    			margin: 0.5rem 0;
+          margin: 0.5rem 0;
           span {
-  	        font-size: 5rem;
-    				font-weight: bold;
-				    vertical-align: middle;
+            font-size: 5rem;
+            font-weight: bold;
+            vertical-align: middle;
             color: #fdd000;
           }
         }
-        .download-app{
-	        font-size: 2rem;
-    			margin-top: 2rem;
+        .download-app {
+          font-size: 2rem;
+          margin-top: 2rem;
         }
       }
     }
   }
 }
+
+
 
 /* .lottery-page.narrow {
   .lottery-wrapper .result-container .final-result {
@@ -789,4 +759,5 @@ export default {
     left: 2%;
   }
 } */
+
 </style>

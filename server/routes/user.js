@@ -24,7 +24,6 @@ router.post('/', (req, res) => {
 				alreadyIn: true
 			})
 		} else {
-			console.log('====params====', params)
 			let user = new User(params)
 			user.save().then(data => {
 				// newUsers.push(data)
@@ -130,7 +129,6 @@ router.delete('/', (req, res) => {
 
 router.delete('/:id', (req, res) => {
 	let id = req.params.id
-	console.log('====id====', id)
 	User.deleteOne(id).then(data => {
 		res.json({
 			success: true,

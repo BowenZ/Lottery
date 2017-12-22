@@ -1,4 +1,4 @@
-const URL = 'http://106.14.92.204:3000'
+export const URL = 'http://106.14.92.204:3000'
 
 export default {
 	BASE: URL,
