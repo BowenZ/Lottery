@@ -7,7 +7,7 @@
       <div class="content">
         <el-table :data="tableData" style="width: 100%" border v-loading="tableLoading">
           <el-table-column type="expand">
-            <template scope="scope">
+            <template slot-scope="scope">
               <div class="lottery-detail">
             		<p>活动内容：{{scope.row.content}}</p>
             		<img :src="getImgUrl(scope.row.companyLogo)" alt="logo">
@@ -32,19 +32,19 @@
           <el-table-column label="奖品等级" prop="level" width="100">
           </el-table-column>
           <el-table-column label="创建时间" prop="createTime" width="240">
-            <template scope="scope">
+            <template slot-scope="scope">
               {{formatDate(scope.row.createTime)}}
             </template>
           </el-table-column>
           <el-table-column label="状态" width="100">
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-tag v-if="scope.row.state == 0">未开始</el-tag>
               <el-tag v-if="scope.row.state == 1" type="success">已开始</el-tag>
               <el-tag v-if="scope.row.state == 2" type="gray">已停止</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="220">
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-button type="text" v-if="scope.row.state != 1" @click="startLottery(scope.$index)">开始</el-button>
               <el-button type="text" v-if="scope.row.state == 1" @click="stopLottery(scope.$index)">停止</el-button>
               <el-button type="text" @click="clearLotteryWinner(scope.$index)">重置</el-button>

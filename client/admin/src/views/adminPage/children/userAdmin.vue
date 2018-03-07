@@ -6,7 +6,7 @@
         <el-table-column prop="tel" label="手机号">
         </el-table-column>
         <el-table-column label="创建时间">
-          <template scope="scope">
+          <template slot-scope="scope">
             {{formatDate(scope.row.createTime)}}
           </template>
         </el-table-column>
@@ -19,7 +19,7 @@
       </template>
     </el-table-column> -->
         <el-table-column label="操作" width="100">
-          <template scope="scope">
+          <template slot-scope="scope">
             <el-button type="text" @click="deleteUser(scope.$index)">删除</el-button>
           </template>
         </el-table-column>

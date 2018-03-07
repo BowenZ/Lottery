@@ -1,9 +1,9 @@
 <template>
 <div id="app">
   <div class="bg">
-    <img v-if="!lotteryEnded" src="~@/assets/bg.jpg"
-         alt="">
-    <img v-else src="~@/assets/bg2.jpg"
+    <!-- <img v-if="!lotteryEnded" src="~@/assets/bg.jpg"
+         alt=""> -->
+    <img src="~@/assets/bg.jpg"
          alt="">
   </div>
   <div class="join"
@@ -18,8 +18,13 @@
          @click="handleClickJoin">参与抽奖</a>
     </div>
     <div class="bottom-text">
-      <img src="~@/assets/copy.png"
-           alt="">
+      <!-- <img src="~@/assets/copy.png"
+           alt=""> -->
+      <p>签到抽奖</p>
+      <p>一等奖5名：王者荣耀手办</p>
+      <p>二等奖5名：嗨森影城100元充值卡5张</p>
+      <p>抽奖仅针对于企业联赛参赛决赛到场人员</p>
+      <p>奖品由嗨森影城与猎模特别提供</p>
     </div>
   </div>
   <div class="waiting shadow-box"
@@ -34,8 +39,10 @@
     <h3 v-if="user">{{user.tel}}</h3>
     <p>如需领取奖励，请前往外场一步用车工作处兑奖。</p>
   </div> -->
-  <div class="register" v-if="lotteryEnded">
-    <div class="input-container shadow-box" v-if="!registerEnded">
+  <div class="register"
+       v-if="lotteryEnded">
+    <h1>抽奖活动已经结束</h1>
+    <!-- <div class="input-container shadow-box" v-if="!registerEnded">
       <div class="tel-input">
         <input type="tel"
                v-model="userTel"
@@ -55,7 +62,7 @@
     <div class="bottom-text">
       <img src="~@/assets/copy2.png"
            alt="">
-    </div>
+    </div> -->
   </div>
 </div>
 
@@ -63,8 +70,8 @@
 
 <script>
 import axios from 'axios';
-import qs from 'qs'
-import { Toast,Indicator } from 'mint-ui';
+import qs from 'qs';
+import { Toast, Indicator } from 'mint-ui';
 
 let ajax = axios.create({
   baseURL: '/',
@@ -84,7 +91,7 @@ export default {
       userTel: '',
       user: null,
       lotteryEnded: false,
-      registerEnded: false,
+      registerEnded: false
     }
   },
   methods: {
@@ -100,7 +107,7 @@ export default {
       return reg.test(this.userTel)
     },
     handleClickJoin() {
-      
+
       if (!this.checkTel()) {
         Toast({
           message: '您输入的手机号有误',
@@ -140,7 +147,7 @@ export default {
         })
       }
     },
-    handleClickRegister(){
+    handleClickRegister() {
       if (!this.checkTel()) {
         Toast({
           message: '您输入的手机号有误',
@@ -154,7 +161,7 @@ export default {
         })).then(res => {
           Indicator.close()
           console.log('====user====', res)
-          if(res.data.code == 0){
+          if (res.data.code == 0) {
             this.registerEnded = true
             Toast({
               message: '恭喜您注册成功'
@@ -165,11 +172,11 @@ export default {
             }).then(res => {
               console.log('====mongo====', res)
             })
-          }else{
+          } else {
             Toast({
               message: res.data.msg || '注册失败'
             })
-            if(res.data.msg == '该用户已注册'){
+            if (res.data.msg == '该用户已注册') {
               this.registerEnded = true
             }
           }
@@ -180,7 +187,7 @@ export default {
     }
   },
   created() {
-    this.user = this.getUser()
+    // this.user = this.getUser()
     axios.get(URL + 'lottery?type=active').then(res => {
       let result = res.data
       if (result.success) {
@@ -236,6 +243,11 @@ body {
   height: 100%;
   background-color: $light;
   overflow: auto;
+  background-image: url('~@/assets/bg-bottom.jpg');
+  background-size: contain;
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-color: #0c1532;
 }
 
 .bg {
@@ -247,7 +259,7 @@ body {
 
 .shadow-box {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, .4);
-  margin: -8vw 5% 0;
+  margin: -2vw 5% 0;
   border-radius: 5px;
   overflow: hidden;
   position: relative;
@@ -256,7 +268,7 @@ body {
 
 .input-container {
   display: flex;
-  height: 16vw;
+  height: 12vw;
   .tel-input {
     flex: 1;
     input {
@@ -265,16 +277,16 @@ body {
       border: none;
       display: block;
       width: 100%;
-      height: 16vw;
+      height: 12vw;
       font-size: 5vw;
       vertical-align: middle;
     }
   }
   a {
     width: 34vw;
-    height: 16vw;
+    height: 12vw;
     display: block;
-    line-height: 16vw;
+    line-height: 12vw;
     text-align: center;
     text-decoration: none;
     color: $dark;
@@ -288,13 +300,20 @@ body {
   width: 100%;
   margin-top: 6%;
   margin-bottom: 2%;
+  p {
+    text-align: center;
+    font-size: 3.2vw;
+    margin: 0;
+    color: #E1E2DA;
+  }
   img {
     display: block;
     width: 100%;
   }
 }
 
-.waiting, .ended {
+.waiting,
+.ended {
   background-color: #fff;
   text-align: center;
   padding: 7vw 0 10vw;
@@ -313,8 +332,11 @@ body {
   }
 }
 
-.register{
-  .register-success{
+.register {
+  h1 {
+    text-align: center;
+  }
+  .register-success {
     background-color: #fff;
     text-align: center;
     padding: 3vw 0 0;
@@ -331,7 +353,7 @@ body {
       margin: 2vw 0 3vw;
       font-size: 3.6vw;
     }
-    .download-btn{
+    .download-btn {
       width: 100%;
       height: 11vw;
       line-height: 11vw;
